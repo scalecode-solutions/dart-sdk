@@ -24,7 +24,7 @@ class MetaGetBuilder {
     _loggerService = GetIt.I.get<LoggerService>();
 
     topic = parent;
-    var me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe?;
+    final me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe?;
 
     if (me != null) {
       if (parent.name != null) {
@@ -35,8 +35,8 @@ class MetaGetBuilder {
 
   /// Get latest timestamp
   DateTime _getIms() {
-    var cupd = contact != null ? contact?.updated : null;
-    var tupd = topic.lastDescUpdate;
+    final cupd = contact?.updated;
+    final tupd = topic.lastDescUpdate;
     return tupd.isAfter(cupd!) ? cupd : tupd;
   }
 
@@ -73,7 +73,7 @@ class MetaGetBuilder {
 
   /// Add query parameters to fetch subscriptions
   MetaGetBuilder withSub(DateTime? ims, int? limit, String? userOrTopic) {
-    var opts = {'ims': ims, 'limit': limit};
+    final opts = {'ims': ims, 'limit': limit};
     if (topic.getType() == 'me') {
       opts['topic'] = userOrTopic;
     } else {
@@ -95,7 +95,7 @@ class MetaGetBuilder {
 
   /// Add query parameters to fetch subscriptions updated since the last update
   MetaGetBuilder withLaterSub(int? limit) {
-    var ims = topic.isP2P() ? _getIms() : topic.lastSubsUpdate;
+    final ims = topic.isP2P() ? _getIms() : topic.lastSubsUpdate;
     return withSub(ims, limit, null);
   }
 
@@ -110,7 +110,7 @@ class MetaGetBuilder {
     if (topic.getType() == 'me') {
       what['cred'] = true;
     } else {
-      _loggerService.error('Invalid topic type for MetaGetBuilder:withCreds ' + topic.getType().toString());
+      _loggerService.error('Invalid topic type for MetaGetBuilder:withCreds ${topic.getType()}');
     }
     return this;
   }
@@ -132,14 +132,14 @@ class MetaGetBuilder {
 
   /// Construct parameters
   GetQuery build() {
-    var what = <String>[];
+    final what = <String>[];
     Map<String, dynamic>? params = <String, dynamic>{};
-    ['data', 'sub', 'desc', 'tags', 'cred', 'del'].forEach((key) {
+    for (var key in ['data', 'sub', 'desc', 'tags', 'cred', 'del']) {
       if (this.what.containsKey(key)) {
         what.add(key);
         params![key] = this.what[key];
       }
-    });
+    }
     if (what.isNotEmpty) {
       params['what'] = what.join(' ');
     } else {

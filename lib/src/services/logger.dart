@@ -10,19 +10,19 @@ class LoggerService {
 
   void error(String value) {
     if (_configService.loggerEnabled == true) {
-      print('ERROR: ' + value);
+      print('ERROR: $value');
     }
   }
 
   void log(String value) {
     if (_configService.loggerEnabled == true) {
-      print('LOG: ' + value);
+      print('LOG: $value');
     }
   }
 
   void warn(String value) {
     if (_configService.loggerEnabled == true) {
-      print('WARN: ' + value);
+      print('WARN: $value');
     }
   }
 }

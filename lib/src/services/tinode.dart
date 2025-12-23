@@ -83,28 +83,28 @@ class TinodeService {
 
     onCtrlMessage.add(ctrl);
 
-    var code = ctrl.code;
+    final code = ctrl.code;
     if (ctrl.id != null && ctrl.id != '' && code != null) {
       _futureManager.execFuture(ctrl.id, code, ctrl, ctrl.text);
     }
 
     if (ctrl.code == 205 && ctrl.text == 'evicted') {
-      Topic? topic = _cacheManager.get('topic', ctrl.topic ?? '') as Topic?;
+      final Topic? topic = _cacheManager.get('topic', ctrl.topic ?? '') as Topic?;
       if (topic != null) {
         topic.resetSubscription();
       }
     }
 
     if (ctrl.params != null && ctrl.params['what'] == 'data') {
-      Topic? topic = _cacheManager.get('topic', ctrl.topic ?? '') as Topic?;
+      final Topic? topic = _cacheManager.get('topic', ctrl.topic ?? '') as Topic?;
       if (topic != null) {
-        var count = ctrl.params['count'] as int?;
+        final count = ctrl.params['count'] as int?;
         topic.allMessagesReceived(count ?? 0);
       }
     }
 
     if (ctrl.params != null && ctrl.params['what'] == 'sub') {
-      Topic? topic = _cacheManager.get('topic', ctrl.topic ?? '') as Topic?;
+      final Topic? topic = _cacheManager.get('topic', ctrl.topic ?? '') as Topic?;
       if (topic != null) {
         topic.processMetaSub([]);
       }
@@ -119,7 +119,7 @@ class TinodeService {
 
     onMetaMessage.add(meta);
 
-    Topic? topic = _cacheManager.get('topic', meta.topic ?? '') as Topic?;
+    final Topic? topic = _cacheManager.get('topic', meta.topic ?? '') as Topic?;
     if (topic != null) {
       topic.routeMeta(meta);
     }
@@ -137,7 +137,7 @@ class TinodeService {
 
     onDataMessage.add(data);
 
-    Topic? topic = _cacheManager.get('topic', data.topic ?? '') as Topic?;
+    final Topic? topic = _cacheManager.get('topic', data.topic ?? '') as Topic?;
     if (topic != null) {
       topic.routeData(data);
     }
@@ -151,7 +151,7 @@ class TinodeService {
 
     onPresMessage.add(pres);
 
-    Topic? topic = pres.topic != null ? _cacheManager.get('topic', pres.topic ?? '') as Topic? : null;
+    final Topic? topic = pres.topic != null ? _cacheManager.get('topic', pres.topic ?? '') as Topic? : null;
     if (topic != null) {
       topic.routePres(pres);
     }
@@ -163,7 +163,7 @@ class TinodeService {
       return;
     }
 
-    Topic? topic = _cacheManager.get('topic', info.topic ?? '') as Topic?;
+    final Topic? topic = _cacheManager.get('topic', info.topic ?? '') as Topic?;
     if (topic != null) {
       topic.routeInfo(info);
     }
@@ -176,17 +176,17 @@ class TinodeService {
     if (pkt.id != null) {
       future = _futureManager.makeFuture(pkt.id ?? '');
     }
-    var formattedPkt = pkt.toMap();
+    final formattedPkt = pkt.toMap();
     formattedPkt['id'] = pkt.id;
     formattedPkt.keys
         .where((k) => formattedPkt[k] == null || (formattedPkt[k] is Map && (formattedPkt[k] as Map).isEmpty))
         .toList()
         .forEach(formattedPkt.remove);
 
-    var json = jsonEncode({pkt.name: formattedPkt});
+    final json = jsonEncode({pkt.name: formattedPkt});
     try {
       _connectionService.sendText(json);
-      _loggerService.log('out: ' + json);
+      _loggerService.log('out: $json');
     } catch (e) {
       if (pkt.id != null) {
         _loggerService.error(e.toString());
@@ -204,14 +204,14 @@ class TinodeService {
     if (deviceToken != null) {
       _configService.deviceToken = deviceToken;
     }
-    var packet = _packetGenerator.generate(packet_types.Hi, null);
+    final packet = _packetGenerator.generate(packet_types.Hi, null);
     return _send(packet);
   }
 
   /// Create or update an account
   Future<dynamic> account(String userId, String scheme, String secret, bool login, AccountParams? params) {
-    Packet? packet = _packetGenerator.generate(packet_types.Acc, null);
-    var data = packet.data as AccPacketData;
+    final Packet? packet = _packetGenerator.generate(packet_types.Acc, null);
+    final data = packet.data as AccPacketData;
     data.user = userId;
     data.login = login;
     data.scheme = scheme;
@@ -233,23 +233,23 @@ class TinodeService {
 
   /// Authenticate current session
   Future<CtrlMessage> login(String scheme, String secret, Map<String, dynamic>? cred) async {
-    var packet = _packetGenerator.generate(packet_types.Login, null);
-    var data = packet.data as LoginPacketData;
+    final packet = _packetGenerator.generate(packet_types.Login, null);
+    final data = packet.data as LoginPacketData;
     data.scheme = scheme;
     data.secret = secret;
     data.cred = [if (cred != null) cred];
 
     packet.data = data;
 
-    CtrlMessage ctrl = await _send(packet) as CtrlMessage;
+    final CtrlMessage ctrl = await _send(packet) as CtrlMessage;
     _authService.onLoginSuccessful(ctrl);
     return ctrl;
   }
 
   /// Send a topic subscription request
   Future<dynamic> subscribe(String? topicName, GetQuery getParams, SetParams? setParams) {
-    var packet = _packetGenerator.generate(packet_types.Sub, topicName);
-    var data = packet.data as SubPacketData;
+    final packet = _packetGenerator.generate(packet_types.Sub, topicName);
+    final data = packet.data as SubPacketData;
 
     if (topicName == '' || topicName == null) {
       topicName = topic_names.TOPIC_NEW;
@@ -283,8 +283,8 @@ class TinodeService {
 
   /// Detach and optionally unsubscribe from the topic
   Future<dynamic> leave(String topicName, bool unsubscribe) {
-    var packet = _packetGenerator.generate(packet_types.Leave, topicName);
-    var data = packet.data as LeavePacketData;
+    final packet = _packetGenerator.generate(packet_types.Leave, topicName);
+    final data = packet.data as LeavePacketData;
     data.unsub = unsubscribe;
     packet.data = data;
     return _send(packet);
@@ -335,8 +335,8 @@ class TinodeService {
 
   /// Request topic metadata
   Future<dynamic> getMeta(String topicName, GetQuery params) {
-    var packet = _packetGenerator.generate(packet_types.Get, topicName);
-    var data = packet.data as GetPacketData;
+    final packet = _packetGenerator.generate(packet_types.Get, topicName);
+    final data = packet.data as GetPacketData;
 
     data.data = params.data?.toMap();
     data.desc = params.desc?.toMap();
@@ -349,10 +349,10 @@ class TinodeService {
 
   /// Update topic's metadata: description, subscriptions
   Future<dynamic> setMeta(String topicName, SetParams params) {
-    var packet = _packetGenerator.generate(packet_types.Set, topicName);
-    var data = packet.data as SetPacketData;
+    final packet = _packetGenerator.generate(packet_types.Set, topicName);
+    final data = packet.data as SetPacketData;
 
-    var what = <String>[];
+    final what = <String>[];
     if (params.desc != null) {
       what.add('desc');
       data.desc = params.desc;
@@ -379,8 +379,8 @@ class TinodeService {
 
   /// Delete some or all messages in a topic
   Future<dynamic> deleteMessages(String topicName, List<DelRange> ranges, bool hard) {
-    var packet = _packetGenerator.generate(packet_types.Del, topicName);
-    var data = packet.data as DelPacketData;
+    final packet = _packetGenerator.generate(packet_types.Del, topicName);
+    final data = packet.data as DelPacketData;
     data.what = 'msg';
     data.delseq = ranges;
     data.hard = hard;
@@ -390,20 +390,20 @@ class TinodeService {
 
   /// Delete the topic all together. Requires Owner permission
   Future<dynamic> deleteTopic(String topicName, bool hard) async {
-    var packet = _packetGenerator.generate(packet_types.Del, topicName);
-    var data = packet.data as DelPacketData;
+    final packet = _packetGenerator.generate(packet_types.Del, topicName);
+    final data = packet.data as DelPacketData;
     data.what = 'topic';
     data.hard = hard;
     packet.data = data;
-    var ctrl = await _send(packet);
+    final ctrl = await _send(packet);
     _cacheManager.delete('topic', topicName);
     return ctrl;
   }
 
   /// Delete subscription. Requires Share permission
   Future<dynamic> deleteSubscription(String topicName, String userId) {
-    var packet = _packetGenerator.generate(packet_types.Del, topicName);
-    var data = packet.data as DelPacketData;
+    final packet = _packetGenerator.generate(packet_types.Del, topicName);
+    final data = packet.data as DelPacketData;
     data.what = 'sub';
     data.user = userId;
     packet.data = data;
@@ -412,8 +412,8 @@ class TinodeService {
 
   /// Delete credential. Always sent on 'me' topic
   Future<dynamic> deleteCredential(String method, String value) {
-    var packet = _packetGenerator.generate(packet_types.Del, topic_names.TOPIC_ME);
-    var data = packet.data as DelPacketData;
+    final packet = _packetGenerator.generate(packet_types.Del, topic_names.TOPIC_ME);
+    final data = packet.data as DelPacketData;
     data.what = 'cred';
     data.cred = {'meth': method, 'val': value};
     packet.data = data;
@@ -422,8 +422,8 @@ class TinodeService {
 
   /// Request to delete account of the current user
   Future<dynamic> deleteCurrentUser(bool hard) {
-    var packet = _packetGenerator.generate(packet_types.Del, null);
-    var data = packet.data as DelPacketData;
+    final packet = _packetGenerator.generate(packet_types.Del, null);
+    final data = packet.data as DelPacketData;
     data.hard = hard;
     data.what = 'user';
     packet.data = data;

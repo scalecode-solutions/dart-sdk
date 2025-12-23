@@ -12,8 +12,8 @@ var messageId = Random().nextInt(0xFFFF) + 0xFFFF;
 class Tools {
   /// Create base URL based on connection options
   static String makeBaseURL(ConnectionOptions config) {
-    var url = (config.secure ?? false) ? 'wss://' : 'ws://';
-    return url + config.host + '/v0/channels?apikey=' + config.apiKey;
+    final url = (config.secure ?? false) ? 'wss://' : 'ws://';
+    return '$url${config.host}/v0/channels?apikey=${config.apiKey}';
   }
 
   /// Get next message Id
@@ -25,7 +25,7 @@ class Tools {
   /// Json parser helper to read messages and converting data to native objects
   static Object? jsonParserHelper(Object? key, Object? value) {
     if (key == 'ts' && value is String && value.length >= 20 && value.length <= 24) {
-      var date = DateTime.parse(value);
+      final date = DateTime.parse(value);
       return date;
     } else if (key == 'acs' && value is Map) {
       return AccessMode(value);
@@ -65,20 +65,20 @@ class Tools {
 
   /// Figure out if the topic name belongs to a new group
   static bool isNewGroupTopicName(String topicName) {
-    var prefix = topicName.substring(0, 3);
+    final prefix = topicName.substring(0, 3);
     return prefix == topic_names.TOPIC_NEW || prefix == topic_names.TOPIC_NEW_CHAN;
   }
 
   /// Figure out if the topic name belongs to a new channel
   static bool isChannelTopicName(String topicName) {
-    var prefix = topicName.substring(0, 3);
+    final prefix = topicName.substring(0, 3);
     return prefix == topic_names.TOPIC_CHAN || prefix == topic_names.TOPIC_NEW_CHAN;
   }
 
   /// Create authorized URL
   static String makeAuthorizedURL(ConnectionOptions config, String token) {
-    var base = makeBaseURL(config);
-    return base + '&auth=token&secret=' + token;
+    final base = makeBaseURL(config);
+    return '$base&auth=token&secret=$token';
   }
 
   /// Trim whitespace, strip empty and duplicate elements elements

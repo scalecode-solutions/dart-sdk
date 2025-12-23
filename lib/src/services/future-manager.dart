@@ -17,32 +17,32 @@ class FutureManager {
   }
 
   Future<dynamic> makeFuture(String id) {
-    var completer = Completer<dynamic>();
+    final completer = Completer<dynamic>();
     _pendingFutures[id] = FutureCallback(completer: completer, ts: DateTime.now());
       return completer.future;
   }
 
   void execFuture(String? id, int code, dynamic onOK, String? errorText) {
-    var callbacks = _pendingFutures[id];
+    final callbacks = _pendingFutures[id];
 
     if (callbacks != null) {
       _pendingFutures.remove(id);
       if (code >= 200 && code < 400) {
         callbacks.completer?.complete(onOK);
       } else {
-        callbacks.completer?.completeError(Exception((errorText ?? '') + ' (' + code.toString() + ')'));
+        callbacks.completer?.completeError(Exception('${errorText ?? ''} ($code)'));
       }
     }
   }
 
   void checkExpiredFutures() {
-    var exception = Exception('Timeout (504)');
-    var expires = DateTime.now().subtract(Duration(milliseconds: _configService.appSettings.expireFuturesTimeout));
+    final exception = Exception('Timeout (504)');
+    final expires = DateTime.now().subtract(Duration(milliseconds: _configService.appSettings.expireFuturesTimeout));
 
-    var markForRemoval = <String>[];
+    final markForRemoval = <String>[];
     _pendingFutures.forEach((String key, FutureCallback featureCB) {
       if (featureCB.ts!.isBefore(expires)) {
-        _loggerService.error('Promise expired ' + key.toString());
+        _loggerService.error('Promise expired $key');
         featureCB.completer?.completeError(exception);
         markForRemoval.add(key);
       }

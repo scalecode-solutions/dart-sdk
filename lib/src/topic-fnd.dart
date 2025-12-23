@@ -19,7 +19,7 @@ class TopicFnd extends Topic {
     _contacts = {};
 
     for (var sub in subscriptions) {
-      var indexBy = sub.topic ?? sub.user ?? '';
+      final indexBy = sub.topic ?? sub.user ?? '';
       _contacts[indexBy] = sub;
       updateCount++;
       onMetaSub.add(sub);
@@ -39,7 +39,7 @@ class TopicFnd extends Topic {
   /// setMeta to TopicFnd resets contact list in addition to sending the message
   @override
   Future<CtrlMessage> setMeta(SetParams params) async {
-    var ctrl = await super.setMeta(params);
+    final ctrl = await super.setMeta(params);
     if (_contacts.isNotEmpty) {
       _contacts = {};
       onSubsUpdated.add([]);

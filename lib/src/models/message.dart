@@ -28,8 +28,8 @@ class Message {
   }
 
   Packet asPubPacket() {
-    var packet = _packetGenerator.generate(packet_types.Pub, topicName);
-    var data = packet.data as PubPacketData;
+    final packet = _packetGenerator.generate(packet_types.Pub, topicName);
+    final data = packet.data as PubPacketData;
     data.content = content;
     data.noecho = !echo;
     packet.data = data;

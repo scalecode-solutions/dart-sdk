@@ -84,7 +84,7 @@ class AccessMode {
       return NONE;
     }
 
-    var bitmask = <String, int>{
+    final bitmask = <String, int>{
       'J': JOIN,
       'R': READ,
       'W': WRITE,
@@ -120,7 +120,7 @@ class AccessMode {
       return 'N';
     }
 
-    var bitmask = ['J', 'R', 'W', 'P', 'A', 'S', 'D', 'O'];
+    final bitmask = ['J', 'R', 'W', 'P', 'A', 'S', 'D', 'O'];
     var res = '';
 
     for (var i = 0; i < bitmask.length; i++) {
@@ -133,7 +133,7 @@ class AccessMode {
 
   /// Updates mode with newly given permissions
   static int update(int val, String upd) {
-    var action = upd[0];
+    final action = upd[0];
 
     if (action == '+' || action == '-') {
       var val0 = val;
@@ -151,8 +151,8 @@ class AccessMode {
       }).toList();
 
       for (var i = 0; i < parts.length; i++) {
-        var action = actions[i];
-        var m0 = AccessMode.decode(parts[i]);
+        final action = actions[i];
+        final m0 = AccessMode.decode(parts[i]);
         if (m0 == INVALID) {
           return val;
         }
@@ -168,7 +168,7 @@ class AccessMode {
       val = val0;
     } else {
       // The string is an explicit new value 'ABC' rather than delta.
-      var val0 = AccessMode.decode(upd);
+      final val0 = AccessMode.decode(upd);
       if (val0 != INVALID) {
         val = val0 ?? 0;
       }
@@ -179,8 +179,8 @@ class AccessMode {
 
   /// Get diff from two modes
   static int diff(dynamic a1, dynamic a2) {
-    var a1d = AccessMode.decode(a1) ?? 0;
-    var a2d = AccessMode.decode(a2) ?? 0;
+    final a1d = AccessMode.decode(a1) ?? 0;
+    final a2d = AccessMode.decode(a2) ?? 0;
 
     if (a1d == INVALID || a2d == INVALID) {
       return INVALID;
@@ -193,14 +193,14 @@ class AccessMode {
   /// side: `mode` / `want` / `given`
   static bool checkFlag(AccessMode val, String? side, int flag) {
     side ??= 'mode';
-    var found = ['given', 'want', 'mode'].where((s) {
+    final found = ['given', 'want', 'mode'].where((s) {
       return s == side;
     }).toList();
 
     if (found.isNotEmpty) {
       return ((val[side] & flag) != 0);
     }
-    throw Exception('Invalid AccessMode component "' + side + '"');
+    throw Exception('Invalid AccessMode component "$side"');
   }
 
   /// Returns encoded `mode`
@@ -260,12 +260,12 @@ class AccessMode {
 
   AccessMode updateAll(AccessMode? val) {
     if (val != null) {
-      var g = val.getGiven();
+      final g = val.getGiven();
       if (g != null) {
         updateGiven(g);
       }
 
-      var w = val.getWant();
+      final w = val.getWant();
       if (w != null) {
         updateWant(w);
       }
@@ -317,13 +317,7 @@ class AccessMode {
 
   @override
   String toString() {
-    return '{"mode": "' +
-        (AccessMode.encode(mode) ?? 'invalid') +
-        '", "given": "' +
-        (AccessMode.encode(_given) ?? 'invalid') +
-        '", "want": "' +
-        (AccessMode.encode(_want) ?? 'invalid') +
-        '"}';
+    return '{"mode": "${AccessMode.encode(mode) ?? 'invalid'}", "given": "${AccessMode.encode(_given) ?? 'invalid'}", "want": "${AccessMode.encode(_want) ?? 'invalid'}"}';
   }
 
   Map<String, String> jsonHelper() {

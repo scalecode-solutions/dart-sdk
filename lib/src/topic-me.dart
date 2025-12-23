@@ -50,7 +50,7 @@ class TopicMe extends Topic {
   @override
   void processMetaDesc(TopicDescription desc) {
     // Check if online contacts need to be turned off because P permission was removed.
-    var turnOff = (desc.acs != null && !desc.acs!.isPresencer(null)) && acs.isPresencer(null);
+    final turnOff = (desc.acs != null && !desc.acs!.isPresencer(null)) && acs.isPresencer(null);
 
     // Copy parameters from desc object to this topic
     acs = desc.acs ?? acs;
@@ -87,7 +87,7 @@ class TopicMe extends Topic {
   @override
   void processMetaSub(List<TopicSubscription> subscriptions) {
     for (var sub in subscriptions) {
-      var topicName = sub.topic;
+      final topicName = sub.topic;
       // Don't show 'me' and 'fnd' topics in the list of contacts.
       if (topicName == topic_names.TOPIC_FND || topicName == topic_names.TOPIC_ME) {
         continue;
@@ -139,7 +139,7 @@ class TopicMe extends Topic {
 
         // Notify topic of the update if it's an external update.
         if (sub.noForwarding == false || sub.noForwarding == null) {
-          var topic = _tinodeService.getTopic(topicName);
+          final topic = _tinodeService.getTopic(topicName);
           if (topic != null) {
             sub.noForwarding = true;
             topic.processMetaDesc(sub.asDesc());
@@ -162,7 +162,7 @@ class TopicMe extends Topic {
     }
 
     if (update) {
-      creds.forEach((cr) {
+      for (var cr in creds) {
         // Adding a credential.
         var idx = _credentials.indexWhere((el) {
           return el.meth == cr.meth && el.val == cr.val;
@@ -196,7 +196,7 @@ class TopicMe extends Topic {
             _credentials[idx].done = true;
           }
         }
-      });
+      }
     } else {
       _credentials = creds;
     }
@@ -219,7 +219,7 @@ class TopicMe extends Topic {
       return;
     }
 
-    var cont = _contacts[pres.src];
+    final cont = _contacts[pres.src];
     if (cont != null) {
       switch (pres.what) {
         case 'on':
@@ -285,7 +285,7 @@ class TopicMe extends Topic {
           // Update topic.del value.
           break;
         default:
-          _loggerService.log("Unsupported presence update in 'me' " + (pres.what ?? ''));
+          _loggerService.log("Unsupported presence update in 'me' ${pres.what ?? ''}");
       }
 
       onContactUpdate.add(ContactUpdateEvent(pres.what!, cont));
@@ -294,13 +294,13 @@ class TopicMe extends Topic {
         // New subscriptions and deleted/banned subscriptions have full
         // access mode (no + or - in the dacs string). Changes to known subscriptions are sent as
         // deltas, but they should not happen here.
-        AccessMode? acs = AccessMode(pres.dacs);
+        final AccessMode? acs = AccessMode(pres.dacs);
 
         if (acs.mode == INVALID) {
-          _loggerService.error('Invalid access mode update ' + (pres.src ?? '') + ' ' + pres.dacs.toString());
+          _loggerService.error('Invalid access mode update ${pres.src ?? ''} ${pres.dacs}');
           return;
         } else if (acs.mode == NONE) {
-          _loggerService.warn('Removing non-existent subscription ' + (pres.src ?? '') + ' ' + pres.dacs.toString());
+          _loggerService.warn('Removing non-existent subscription ${pres.src ?? ''} ${pres.dacs}');
         } else {
           // New subscription. Send request for the full description.
           // Using .withOneSub (not .withLaterOneSub) to make sure IfModifiedSince is not set.
@@ -328,11 +328,11 @@ class TopicMe extends Topic {
     }
 
     // Send {del} message, return promise
-    var response = await _tinodeService.deleteCredential(method, value);
-    var ctrl = CtrlMessage.fromMessage(response as Map<String, dynamic>);
+    final response = await _tinodeService.deleteCredential(method, value);
+    final ctrl = CtrlMessage.fromMessage(response as Map<String, dynamic>);
 
     // Remove deleted credential from the cache.
-    var index = _credentials.indexWhere((el) {
+    final index = _credentials.indexWhere((el) {
       return el.meth == method && el.val == value;
     });
 
@@ -350,7 +350,7 @@ class TopicMe extends Topic {
 
   /// Update a cached contact with new read/received/message count
   void setMsgReadRecv(String contactName, String what, int seq, DateTime? ts) {
-    var cont = _contacts[contactName];
+    final cont = _contacts[contactName];
     int? oldVal;
     var doUpdate = false;
 
@@ -402,7 +402,7 @@ class TopicMe extends Topic {
 
   /// Get cached read/received/message count for the given contact.
   int getMsgReadRecv(String contactName, String what) {
-    var cont = _contacts[contactName];
+    final cont = _contacts[contactName];
     if (cont != null) {
       switch (what) {
         case 'recv':
@@ -424,7 +424,7 @@ class TopicMe extends Topic {
   /// Get access mode of a given contact from cache
   AccessMode? getContactAccessMode(String? topicName) {
     if (topicName != null && topicName.isNotEmpty) {
-      var cont = _contacts[topicName];
+      final cont = _contacts[topicName];
       return cont?.acs;
     }
     return null;
@@ -432,7 +432,7 @@ class TopicMe extends Topic {
 
   /// Check if contact is archived, i.e. contact.private.arch == true.
   bool? isContactArchived(String topicName) {
-    var cont = _contacts[topicName];
+    final cont = _contacts[topicName];
     return cont != null ? ((cont.private != null && cont.private is Map && cont.private['arch'] == true) ? true : false) : null;
   }
 

@@ -1,4 +1,4 @@
-library tindarts_sdk;
+library;
 
 import 'dart:async';
 import 'dart:convert';
@@ -127,7 +127,7 @@ class Tinode {
 
   /// Register services in dependency injection container
   void _registerDependencies(ConnectionOptions options, bool loggerEnabled) {
-    var registered = GetIt.I.isRegistered<ConfigService>();
+    final registered = GetIt.I.isRegistered<ConfigService>();
 
     if (!registered) {
       GetIt.I.registerSingleton<ConfigService>(ConfigService(loggerEnabled));
@@ -183,7 +183,7 @@ class Tinode {
     _futureManager.rejectAllFutures(0, 'disconnect');
     _cacheManager.map((String key, dynamic value) {
       if (key.contains('topic:')) {
-        Topic topic = value as Topic;
+        final Topic topic = value as Topic;
         topic.resetSubscription();
       }
       return MapEntry(key, value);
@@ -196,7 +196,7 @@ class Tinode {
     if (input == null || input == '') {
       return;
     }
-    _loggerService.log('in: ' + input);
+    _loggerService.log('in: $input');
 
     // Send raw message to listener
     onRawMessage.add(input);
@@ -206,14 +206,14 @@ class Tinode {
       return;
     }
 
-    var pkt = jsonDecode(input, reviver: Tools.jsonParserHelper);
+    final pkt = jsonDecode(input, reviver: Tools.jsonParserHelper);
     if (pkt == null) {
       _loggerService.error('failed to parse data');
       return;
     }
 
     /// Decode map into model
-    var message = ServerMessage.fromMessage(pkt as Map<String, dynamic>);
+    final message = ServerMessage.fromMessage(pkt as Map<String, dynamic>);
 
     // Send complete packet to listener
     onMessage.add(message);
@@ -279,8 +279,8 @@ class Tinode {
   /// * Language
   /// * Platform
   Future<CtrlMessage> hello({String? deviceToken}) async {
-    var response = await _tinodeService.hello(deviceToken: deviceToken);
-    CtrlMessage ctrl = response is CtrlMessage ? response : CtrlMessage.fromMessage(response as Map<String, dynamic>);
+    final response = await _tinodeService.hello(deviceToken: deviceToken);
+    final CtrlMessage ctrl = response is CtrlMessage ? response : CtrlMessage.fromMessage(response as Map<String, dynamic>);
 
     if (ctrl.params != null) {
       _configService.setServerConfiguration(ctrl.params as Map<String, dynamic>);
@@ -315,13 +315,13 @@ class Tinode {
   /// Create user with 'basic' authentication scheme and immediately
   /// use it for authentication. Wrapper for `createAccount`
   Future<dynamic> createAccountBasic(String username, String password, bool login, AccountParams? params) {
-    var secret = base64.encode(utf8.encode(username + ':' + password));
+    final secret = base64.encode(utf8.encode('$username:$password'));
     return createAccount('basic', secret, login, params);
   }
 
   /// Update account with basic
   Future<dynamic> updateAccountBasic(String userId, String username, String password, AccountParams? params) {
-    var secret = base64.encode(utf8.encode(username + ':' + password));
+    final secret = base64.encode(utf8.encode('$username:$password'));
     return account(userId, 'basic', secret, false, params);
   }
 
@@ -332,8 +332,8 @@ class Tinode {
 
   /// Wrapper for `login` with basic authentication
   Future<CtrlMessage> loginBasic(String username, String password, Map<String, dynamic>? cred) async {
-    var secret = base64.encode(utf8.encode(username + ':' + password));
-    var ctrl = await login('basic', secret, cred);
+    final secret = base64.encode(utf8.encode('$username:$password'));
+    final ctrl = await login('basic', secret, cred);
     _authService.setLastLogin(username);
     return ctrl;
   }
@@ -348,7 +348,7 @@ class Tinode {
   /// * method - method to use for resetting the secret, such as "email" or "tel"
   /// * value - value of the credential to use, a specific email address or a phone number
   Future<CtrlMessage> requestResetSecret(String scheme, String method, String value) {
-    var secret = base64.encode(utf8.encode(scheme + ':' + method + ':' + value));
+    final secret = base64.encode(utf8.encode('$scheme:$method:$value'));
     return login('reset', secret, null);
   }
 
@@ -409,7 +409,7 @@ class Tinode {
 
   /// Request to delete account of the current user
   Future<dynamic> deleteCurrentUser(bool hard) async {
-    var ctrl = _tinodeService.deleteCurrentUser(hard);
+    final ctrl = _tinodeService.deleteCurrentUser(hard);
     _authService.setUserId(null);
     return ctrl;
   }
@@ -543,16 +543,16 @@ class Tinode {
 
   /// Check if given topic is online
   bool isTopicOnline(String topicName) {
-    var me = getMeTopic();
-    var cont = me.getContact(topicName);
+    final me = getMeTopic();
+    final cont = me.getContact(topicName);
     return cont != null && cont.online!;
   }
 
   /// Get access mode for the given contact
   AccessMode? getTopicAccessMode(String topicName) {
-    var me = getMeTopic();
-    var cont = me.getContact(topicName);
-    return cont != null ? cont.acs : null;
+    final me = getMeTopic();
+    final cont = me.getContact(topicName);
+    return cont?.acs;
   }
 
   // ============== File Upload/Download API ==============

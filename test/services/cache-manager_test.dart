@@ -23,7 +23,7 @@ void main() {
   GetIt.I.registerSingleton<CacheManager>(CacheManager());
   GetIt.I.registerSingleton<TinodeService>(TinodeService());
 
-  var service = CacheManager();
+  final service = CacheManager();
 
   test('put() should put data into cache', () {
     service.put('type', 'test', {'name': 'hello'});
@@ -48,14 +48,14 @@ void main() {
   });
 
   test('putTopic() should put topic type data into cache', () {
-    var t = Topic('cool');
+    final t = Topic('cool');
     t.seq = 100;
     service.putTopic(t);
     expect(service.get('topic', 'cool').seq, 100);
   });
 
   test('deleteTopic() should delete topic type data from cache', () {
-    var t = Topic('cool');
+    final t = Topic('cool');
     t.seq = 100;
     service.putTopic(t);
     expect(service.get('topic', 'cool').seq, 100);
@@ -71,12 +71,12 @@ void main() {
   });
 
   test('map() should execute a function for all values in cache', () {
-    var t = Topic('cool');
+    final t = Topic('cool');
     t.isSubscribed = true;
     service.putTopic(t);
     service.map((String key, dynamic value) {
       if (key.contains('topic:')) {
-        Topic topic = value as Topic;
+        final Topic topic = value as Topic;
         topic.resetSubscription();
       }
       return MapEntry(key, value);

@@ -21,8 +21,8 @@ class GetOptsType {
   }
 
   Map<String, dynamic> toMap() {
-    var map = {
-      'ims': ims != null ? ims?.toIso8601String() : null,
+    final map = {
+      'ims': ims?.toIso8601String(),
       'limit': limit,
       'topic': topic,
       'user': user,
@@ -48,7 +48,7 @@ class GetDataType {
   }
 
   Map<String, dynamic> toMap() {
-    var map = {
+    final map = {
       'since': since,
       'before': before,
       'limit': limit,
@@ -93,14 +93,14 @@ class GetQuery {
   }
 
   Map<String, dynamic> toMap() {
-    var map = {
+    final map = {
       'topic':topic,
       'cred': cred,
       'what': what,
-      'data': data != null ? data?.toMap() : null,
-      'del': del != null ? del?.toMap() : null,
-      'desc': desc != null ? desc?.toMap() : null,
-      'sub': sub != null ? sub?.toMap() : null,
+      'data': data?.toMap(),
+      'del': del?.toMap(),
+      'desc': desc?.toMap(),
+      'sub': sub?.toMap(),
       'tags': tags,
     };
     map.removeWhere((key, value) => value == null);

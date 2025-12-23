@@ -47,7 +47,7 @@ class SortedCache<T> {
 
   /// Insert element into a sorted array
   List<T> insertSorted(T element, List<T> array) {
-    var found = findNearest(element, array, false);
+    final found = findNearest(element, array, false);
     final int idx = found['idx'] as int;
     if (idx >= 0 && idx <= array.length) {
       if (idx < array.length && found['exact'] == true && unique) {
@@ -74,9 +74,9 @@ class SortedCache<T> {
 
   /// Add new elements to the buffer
   void put(List<T> elements) {
-    elements.forEach((insert) {
+    for (var insert in elements) {
       insertSorted(insert, buffer);
-    });
+    }
   }
 
   /// Remove element at the given position
@@ -110,7 +110,7 @@ class SortedCache<T> {
 
   ///  Find element in buffer using buffer's comparison function
   int find(T element, bool nearest) {
-    var found = findNearest(element, buffer, !nearest);
+    final found = findNearest(element, buffer, !nearest);
     return found['idx'] as int;
   }
 }

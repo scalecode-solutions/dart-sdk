@@ -44,7 +44,7 @@ class AuthService {
       return;
     }
 
-    var params = ctrl.params as Map<String, dynamic>?;
+    final params = ctrl.params as Map<String, dynamic>?;
     if (params == null || params['user'] == null) {
       return;
     }
@@ -58,8 +58,8 @@ class AuthService {
       _authToken = null;
     }
 
-    var code = ctrl.code;
-    var text = ctrl.text;
+    final code = ctrl.code;
+    final text = ctrl.text;
     if (code != null && text != null) {
       onLogin.add(OnLoginData(code, text));
     }

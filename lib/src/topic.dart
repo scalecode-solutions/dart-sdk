@@ -176,9 +176,9 @@ class Topic {
 
     // Send subscribe message, handle async response.
     // If topic name is explicitly provided, use it. If no name, then it's a new group topic, use "new".
-    var response = await _tinodeService.subscribe(name ?? topic_names.TOPIC_NEW, getParams, setParams);
-    var ctrl = response is CtrlMessage ? response : null;
-    var meta = response is MetaMessage ? response : null;
+    final response = await _tinodeService.subscribe(name ?? topic_names.TOPIC_NEW, getParams, setParams);
+    final ctrl = response is CtrlMessage ? response : null;
+    final meta = response is MetaMessage ? response : null;
 
     if (meta != null) {
       return Future.value(CtrlMessage());
@@ -208,7 +208,7 @@ class Topic {
 
       if (name != topic_names.TOPIC_ME && name != topic_names.TOPIC_FND) {
         // Add the new topic to the list of contacts maintained by the 'me' topic.
-        var me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe?;
+        final me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe?;
         if (me != null) {
           me.processMetaSub([
             TopicSubscription(
@@ -244,7 +244,7 @@ class Topic {
     message.setStatus(message_status.SENDING);
 
     try {
-      var response = await _tinodeService.publishMessage(message);
+      final response = await _tinodeService.publishMessage(message);
       CtrlMessage? ctrl;
       if (response is CtrlMessage) {
         ctrl = response;
@@ -253,7 +253,7 @@ class Topic {
       }
       if (ctrl != null) {
         message.ts = ctrl.ts;
-        var seq = ctrl.params['seq'] as int?;
+        final seq = ctrl.params['seq'] as int?;
         if (seq != null) {
           message.setStatus(message_status.SENT);
           routeData(message.asDataMessage(_authService.userId ?? '', seq));
@@ -278,7 +278,7 @@ class Topic {
       return Future.error(Exception('Cannot publish on inactive topic'));
     }
 
-    var ctrl = await _tinodeService.leave(name ?? '', unsubscribe);
+    final ctrl = await _tinodeService.leave(name ?? '', unsubscribe);
     resetSubscription();
     if (unsubscribe) {
       _cacheManager.delete('topic', name ?? '');
@@ -298,7 +298,7 @@ class Topic {
   /// `limit` - number of messages to get.
   /// `forward` if true, request newer messages.
   Future<dynamic> getMessagesPage(int limit, bool forward) {
-    var query = startMetaQuery();
+    final query = startMetaQuery();
     var future = getMeta(query.build());
 
     if (forward) {
@@ -306,7 +306,7 @@ class Topic {
     } else {
       query.withEarlierData(limit);
       future = future.then((response) {
-        var ctrl = CtrlMessage.fromMessage(response as Map<String, dynamic>);
+        final ctrl = CtrlMessage.fromMessage(response as Map<String, dynamic>);
         if (ctrl.params != null && (ctrl.params['count'] == null || ctrl.params['count'] == 0)) {
           _noEarlierMsgs = true;
         }
@@ -323,8 +323,8 @@ class Topic {
     }
 
     // Send Set message, handle async response.
-    var response = await _tinodeService.setMeta(name ?? '', params);
-    var ctrl = response is CtrlMessage ? response : CtrlMessage.fromMessage(response as Map<String, dynamic>);
+    final response = await _tinodeService.setMeta(name ?? '', params);
+    final ctrl = response is CtrlMessage ? response : CtrlMessage.fromMessage(response as Map<String, dynamic>);
 
     if (ctrl.code! >= 300) {
       // Not modified
@@ -371,8 +371,8 @@ class Topic {
 
   /// Update access mode of the current user or of another topic subscriber
   Future<CtrlMessage> updateMode(String? userId, String update) {
-    var user = userId != null && userId != '' ? subscriber(userId) : null;
-    var am = user != null ? user.acs!.updateGiven(update).getGiven() : getAccessMode().updateWant(update).getWant();
+    final user = userId != null && userId != '' ? subscriber(userId) : null;
+    final am = user != null ? user.acs!.updateGiven(update).getGiven() : getAccessMode().updateWant(update).getWant();
     return setMeta(SetParams(sub: TopicSubscription(user: userId, mode: am)));
   }
 
@@ -407,8 +407,8 @@ class Topic {
 
     // Remove pending messages from ranges possibly clipping some ranges.
     // ignore: omit_local_variable_types
-    List<DelRange> toSend = [];
-    ranges.forEach((r) {
+    final List<DelRange> toSend = [];
+    for (var r in ranges) {
       if (r.low! < _configService.appSettings.localSeqId) {
         if (r.hi == null || r.hi! < _configService.appSettings.localSeqId) {
           toSend.add(r);
@@ -417,7 +417,7 @@ class Topic {
           toSend.add(DelRange(low: r.low, hi: _maxSeq + 1));
         }
       }
-    });
+    }
 
     // Send {del} message, return promise
     Future<dynamic> result;
@@ -429,20 +429,20 @@ class Topic {
       });
     }
 
-    var response = await result;
-    var ctrl = CtrlMessage.fromMessage(response as Map<String, dynamic>);
+    final response = await result;
+    final ctrl = CtrlMessage.fromMessage(response as Map<String, dynamic>);
 
     if (ctrl.params != null && (ctrl.params['del'] as int? ?? 0) > _maxDel) {
       _maxDel = ctrl.params['del'] as int;
     }
 
-    ranges.forEach((r) {
+    for (var r in ranges) {
       if (r.hi != 0) {
         flushMessageRange(r.low!, r.hi!);
       } else {
         flushMessage(r.low!);
       }
-    });
+    }
 
     _updateDeletedRanges();
     // Calling with no parameters to indicate the messages were deleted.
@@ -464,13 +464,13 @@ class Topic {
     list.sort((a, b) => a - b);
 
     // Convert the array of IDs to ranges
-    var ranges = <DelRange>[];
+    final ranges = <DelRange>[];
     list.map((id) {
       if (ranges.isEmpty) {
         // First element.
         ranges.add(DelRange(low: id));
       } else {
-        var prev = ranges[ranges.length - 1];
+        final prev = ranges[ranges.length - 1];
         if ((prev.hi == null && (id != prev.low! + 1)) || (id > prev.hi!)) {
           // New range.
           ranges.add(DelRange(low: id));
@@ -488,7 +488,7 @@ class Topic {
 
   /// Delete topic. Requires Owner permission. Wrapper for Tinode.delTopic
   Future<CtrlMessage> deleteTopic(bool hard) async {
-    var ctrl = await _tinodeService.deleteTopic(name ?? '', hard);
+    final ctrl = await _tinodeService.deleteTopic(name ?? '', hard);
     resetSubscription();
     _gone();
     return CtrlMessage.fromMessage(ctrl as Map<String, dynamic>);
@@ -500,7 +500,7 @@ class Topic {
       return Future.error(Exception('Cannot delete subscription in inactive topic'));
     }
     // Send {del} message, return promise
-    var ctrl = await _tinodeService.deleteSubscription(name ?? '', userId);
+    final ctrl = await _tinodeService.deleteSubscription(name ?? '', userId);
     // Remove the object from the subscription cache;
     _users.remove(userId);
     // Notify listeners
@@ -515,8 +515,8 @@ class Topic {
       return;
     }
 
-    var me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe?;
-    var user = _users[_authService.userId];
+    final me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe?;
+    final user = _users[_authService.userId];
 
     var update = false;
     if (user != null) {
@@ -571,7 +571,7 @@ class Topic {
   /// Get user description from global cache. The user does not need to be a
   /// subscriber of this topic.
   TopicSubscription? userDescription(String userId) {
-    var user = _cacheManager.getUser(userId);
+    final user = _cacheManager.getUser(userId);
     return user;
   }
 
@@ -608,7 +608,7 @@ class Topic {
   int _msgReceiptCount(String what, int seq) {
     var count = 0;
     if (seq > 0) {
-      var me = _authService.userId;
+      final me = _authService.userId;
       _users.forEach((key, user) {
         if (user.user != me) {
           if (what == 'recv' && (user.recv ?? 0) >= seq) {
@@ -657,13 +657,13 @@ class Topic {
   }
 
   DataMessage? flushMessage(int seqId) {
-    var idx = _messages.find(DataMessage(seq: seqId), false);
+    final idx = _messages.find(DataMessage(seq: seqId), false);
     return idx >= 0 ? _messages.deleteAt(idx) : null;
   }
 
   void flushMessageRange(int fromId, int untilId) {
     // start, end: find insertion points (nearest == true).
-    var since = _messages.find(DataMessage(seq: fromId), true);
+    final since = _messages.find(DataMessage(seq: fromId), true);
     return since >= 0 ? _messages.deleteRange(since, _messages.find(DataMessage(seq: untilId), true)) : [];
   }
 
@@ -737,7 +737,7 @@ class Topic {
     onData.add(data);
 
     // Update locally cached contact with the new message count.
-    var me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe;
+    final me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe;
     me.setMsgReadRecv(name ?? '', (data.from == null || _tinodeService.isMe(data.from!)) ? 'read' : 'msg', data.seq!, data.ts);
   }
 
@@ -786,7 +786,7 @@ class Topic {
         if (user != null) {
           user.online = pres.what == 'on';
         } else {
-          _loggerService.warn('Presence update for an unknown user' + (name ?? '') + ' ' + (pres.src ?? ''));
+          _loggerService.warn('Presence update for an unknown user${name ?? ''} ${pres.src ?? ''}');
         }
         break;
 
@@ -796,12 +796,12 @@ class Topic {
         break;
 
       case 'acs':
-        var userId = pres.src ?? _authService.userId;
+        final userId = pres.src ?? _authService.userId;
         user = _users[userId];
 
         if (user == null) {
           // Update for an unknown user: notification of a new subscription.
-          AccessMode? acs = AccessMode(null).updateAll(pres.dacs);
+          final AccessMode? acs = AccessMode(null).updateAll(pres.dacs);
           if (acs.mode != NONE) {
             user = _cacheManager.getUser(userId ?? '');
 
@@ -825,7 +825,7 @@ class Topic {
 
         break;
       default:
-        _loggerService.log('Ignored presence update ' + (pres.what ?? ''));
+        _loggerService.log('Ignored presence update ${pres.what ?? ''}');
     }
 
     onPres.add(pres);
@@ -833,7 +833,7 @@ class Topic {
 
   void routeInfo(InfoMessage info) {
     if (info.what != 'kp') {
-      var user = _users[info.from];
+      final user = _users[info.from];
       if (user != null) {
         if (info.what == 'recv') {
           user.recv = info.seq;
@@ -849,7 +849,7 @@ class Topic {
 
       // If this is an update from the current user, update the contact with the new count too.
       if (_tinodeService.isMe(info.from ?? '')) {
-        var me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe;
+        final me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe;
         me.setMsgReadRecv(info.topic!, info.what!, info.seq!, null);
       }
     }
@@ -879,7 +879,7 @@ class Topic {
     touched = desc.touched ?? touched;
 
     if (name == topic_names.TOPIC_ME && !desc.noForwarding!) {
-      var me = _tinodeService.getTopic(topic_names.TOPIC_ME);
+      final me = _tinodeService.getTopic(topic_names.TOPIC_ME);
       if (me != null) {
         me.processMetaSub([
           TopicSubscription(
@@ -1023,11 +1023,11 @@ class Topic {
 
   /// Calculate ranges of missing messages
   void _updateDeletedRanges() {
-    var ranges = <DataMessage>[];
+    final ranges = <DataMessage>[];
     DataMessage prev;
 
     // Check for gap in the beginning, before the first message.
-    var first = _messages.length > 0 ? _messages.getAt(0) : null;
+    final first = _messages.length > 0 ? _messages.getAt(0) : null;
 
     if (first != null && _minSeq > 1 && !_noEarlierMsgs) {
       // Some messages are missing in the beginning.
@@ -1083,8 +1083,8 @@ class Topic {
 
     // Check for missing messages at the end.
     // All messages could be missing or it could be a new topic with no messages.
-    var last = _messages.length > 0 ? _messages.getLast() : null;
-    var maxSeq = max(seq!, _maxSeq);
+    final last = _messages.length > 0 ? _messages.getLast() : null;
+    final maxSeq = max(seq!, _maxSeq);
     if ((maxSeq > 0 && last == null) || (last != null && (((last.hi != null && last.hi! > 0) ? last.hi : last.seq)! < maxSeq))) {
       if (last != null && (last.hi != null && last.hi! > 0)) {
         // Extend existing gap

@@ -11,6 +11,7 @@
 ///
 /// Note: Set the environment variables TINODE_USER and TINODE_PASS for login,
 /// or leave them unset to create a new account.
+library;
 
 import 'dart:io';
 
@@ -73,7 +74,7 @@ void main() async {
       // Create a new account for testing
       print('Creating new account...');
       final testUser = 'darttest${DateTime.now().millisecondsSinceEpoch}';
-      final testPass = 'password123';
+      const testPass = 'password123';
 
       try {
         // createAccountBasic(username, password, login, params)

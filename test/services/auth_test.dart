@@ -5,7 +5,7 @@ import 'package:tindarts_sdk/src/models/server-messages.dart';
 import 'package:tindarts_sdk/src/services/auth.dart';
 
 void main() {
-  var service = AuthService();
+  final service = AuthService();
 
   test('setLastLogin() should set last login', () {
     service.setLastLogin('test');
@@ -23,7 +23,7 @@ void main() {
   });
 
   test('onLoginSuccessful() should set userId', () {
-    var expireDate = DateTime.now();
+    final expireDate = DateTime.now();
     service.onLoginSuccessful(CtrlMessage(
       code: 200,
       params: {

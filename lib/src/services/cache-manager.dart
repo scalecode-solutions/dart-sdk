@@ -24,17 +24,17 @@ class CacheManager {
 
   /// Put a new data into cache, if the data already exists, replace it
   void put(String type, String name, dynamic obj) {
-    _cache[type + ':' + name] = obj;
+    _cache['$type:$name'] = obj;
   }
 
   /// Get a specific data from cache using type and name
   dynamic get(String type, String name) {
-    return _cache[type + ':' + name];
+    return _cache['$type:$name'];
   }
 
   /// Delete a specific key-value from cache map
   void delete(String type, String name) {
-    _cache.remove(type + ':' + name);
+    _cache.remove('$type:$name');
   }
 
   /// Executes a function for each element in cache, just like map method on `Map`
