@@ -76,7 +76,7 @@ void main() {
     service.putTopic(t);
     service.map((String key, dynamic value) {
       if (key.contains('topic:')) {
-        Topic topic = value;
+        Topic topic = value as Topic;
         topic.resetSubscription();
       }
       return MapEntry(key, value);

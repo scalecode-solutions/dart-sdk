@@ -13,10 +13,10 @@ class GetOptsType {
 
   static GetOptsType fromMessage(Map<String, dynamic> msg) {
     return GetOptsType(
-      ims: msg['ims'],
-      limit: msg['limit'],
-      topic: msg['topic'],
-      user: msg['user'],
+      ims: msg['ims'] as DateTime?,
+      limit: msg['limit'] as int?,
+      topic: msg['topic'] as String?,
+      user: msg['user'] as String?,
     );
   }
 
@@ -41,9 +41,9 @@ class GetDataType {
 
   static GetDataType fromMessage(Map<String, dynamic> msg) {
     return GetDataType(
-      since: msg['since'],
-      before: msg['before'],
-      limit: msg['limit'],
+      since: msg['since'] as int?,
+      before: msg['before'] as int?,
+      limit: msg['limit'] as int?,
     );
   }
 
@@ -81,14 +81,14 @@ class GetQuery {
 
   static GetQuery fromMessage(Map<String, dynamic> msg) {
     return GetQuery(
-      topic: msg['topic'],
-      cred: msg['cred'],
-      what: msg['what'],
-      data: msg['data'] != null ? GetDataType.fromMessage(msg['data']) : null,
-      del: msg['del'] != null ? GetDataType.fromMessage(msg['del']) : null,
-      desc: msg['desc'] != null ? GetOptsType.fromMessage(msg['desc']) : null,
-      sub: msg['sub'] != null ? GetOptsType.fromMessage(msg['sub']) : null,
-      tags: msg['tags'],
+      topic: msg['topic'] as String?,
+      cred: msg['cred'] as bool?,
+      what: msg['what'] as String?,
+      data: msg['data'] != null ? GetDataType.fromMessage(msg['data'] as Map<String, dynamic>) : null,
+      del: msg['del'] != null ? GetDataType.fromMessage(msg['del'] as Map<String, dynamic>) : null,
+      desc: msg['desc'] != null ? GetOptsType.fromMessage(msg['desc'] as Map<String, dynamic>) : null,
+      sub: msg['sub'] != null ? GetOptsType.fromMessage(msg['sub'] as Map<String, dynamic>) : null,
+      tags: msg['tags'] as bool?,
     );
   }
 

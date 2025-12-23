@@ -44,16 +44,16 @@ class AuthService {
       return;
     }
 
-    var params = ctrl.params;
+    var params = ctrl.params as Map<String, dynamic>?;
     if (params == null || params['user'] == null) {
       return;
     }
 
-    _userId = params['user'];
+    _userId = params['user'] as String?;
     _authenticated = (ctrl.code ?? 0) >= 200 && (ctrl.code ?? 0) < 300;
 
     if (params['token'] != null && params['expires'] != null) {
-      _authToken = AuthToken(params['token'], DateTime.parse(params['expires']));
+      _authToken = AuthToken(params['token'] as String, DateTime.parse(params['expires'] as String));
     } else {
       _authToken = null;
     }

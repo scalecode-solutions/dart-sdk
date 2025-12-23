@@ -1,14 +1,36 @@
-# Defines a default set of lint rules enforced for
-# projects at Google. For details and rationale,
-# see https://github.com/dart-lang/pedantic#enabled-lints.
-include: package:pedantic/analysis_options.yaml
-
-# For lint rules and documentation, see http://dart-lang.github.io/linter/lints.
-# Uncomment to specify additional rules.
-# linter:
-#   rules:
-#     - camel_case_types
+# Modern Dart lints for best practices.
+include: package:lints/recommended.yaml
 
 analyzer:
-#   exclude:
-#     - path/to/excluded/files/**
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    # Treat missing returns as errors
+    missing_return: error
+    # Treat dead code as warnings
+    dead_code: warning
+  exclude:
+    - "**/*.g.dart"
+    - "build/**"
+
+linter:
+  rules:
+    # Enforce public API documentation
+    public_member_api_docs: false # Enable later when docs are complete
+    # Prefer const constructors
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    # Avoid unnecessary null checks
+    avoid_null_checks_in_equality_operators: true
+    # Use final for local variables
+    prefer_final_locals: true
+    # Prefer single quotes
+    prefer_single_quotes: true
+    # Avoid print statements in production code
+    avoid_print: false # We use logger service instead
+    # Type annotations
+    always_declare_return_types: true
+    # Prefer expression functions
+    prefer_expression_function_bodies: false

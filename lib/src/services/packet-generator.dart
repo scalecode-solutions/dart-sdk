@@ -112,7 +112,7 @@ class PacketGenerator {
         );
         break;
       default:
-        packetData = null as dynamic;
+        throw Exception('Unknown packet type: $type');
     }
 
     return Packet(type, packetData, Tools.getNextUniqueId());

@@ -23,7 +23,7 @@ class Tools {
   }
 
   /// Json parser helper to read messages and converting data to native objects
-  static dynamic jsonParserHelper(key, value) {
+  static Object? jsonParserHelper(Object? key, Object? value) {
     if (key == 'ts' && value is String && value.length >= 20 && value.length <= 24) {
       var date = DateTime.parse(value);
       return date;
@@ -35,10 +35,6 @@ class Tools {
 
   /// Returns the type of topic based on topic name
   static String? topicType(String topicName) {
-    if (topicName.runtimeType != String) {
-      return 'xxx';
-    }
-
     const types = {
       'me': 'me',
       'fnd': 'fnd',
@@ -70,13 +66,13 @@ class Tools {
   /// Figure out if the topic name belongs to a new group
   static bool isNewGroupTopicName(String topicName) {
     var prefix = topicName.substring(0, 3);
-    return (topicName is String) && (prefix == topic_names.TOPIC_NEW || prefix == topic_names.TOPIC_NEW_CHAN);
+    return prefix == topic_names.TOPIC_NEW || prefix == topic_names.TOPIC_NEW_CHAN;
   }
 
   /// Figure out if the topic name belongs to a new channel
   static bool isChannelTopicName(String topicName) {
     var prefix = topicName.substring(0, 3);
-    return (topicName is String) && (prefix == topic_names.TOPIC_CHAN || prefix == topic_names.TOPIC_NEW_CHAN);
+    return prefix == topic_names.TOPIC_CHAN || prefix == topic_names.TOPIC_NEW_CHAN;
   }
 
   /// Create authorized URL
@@ -90,21 +86,19 @@ class Tools {
   static List<String> normalizeArray(List<String> arr) {
     var out = <String>[];
 
-    if (arr is List) {
-      // Trim, throw away very short and empty tags.
-      for (var i = 0, l = arr.length; i < l; i++) {
-        var t = arr[i];
-        if (t != null && t != '') {
-          t = t.trim().toLowerCase();
-          if (t.length > 1) {
-            out.add(t);
-          }
+    // Trim, throw away very short and empty tags.
+    for (var i = 0, l = arr.length; i < l; i++) {
+      var t = arr[i];
+      if (t != '') {
+        t = t.trim().toLowerCase();
+        if (t.length > 1) {
+          out.add(t);
         }
       }
-      out.sort();
-      out = out.toSet().toList();
     }
-    if (out.isEmpty) {
+    out.sort();
+    out = out.toSet().toList();
+      if (out.isEmpty) {
       // Add single tag with a Unicode Del character, otherwise an empty array
       // is ambiguous. The Del tag will be stripped by the server.
       out.add(DEL_CHAR);

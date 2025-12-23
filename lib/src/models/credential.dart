@@ -20,9 +20,9 @@ class Credential {
 
   static Credential fromMessage(Map<String, dynamic> msg) {
     return Credential(
-      meth: msg['meth'],
-      val: msg['val'],
-      done: msg['done'],
+      meth: msg['meth'] as String?,
+      val: msg['val'] as String?,
+      done: msg['done'] as bool?,
     );
   }
 

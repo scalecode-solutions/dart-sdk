@@ -38,13 +38,13 @@ class CacheManager {
   }
 
   /// Executes a function for each element in cache, just like map method on `Map`
-  void map(MapEntry Function(String, dynamic) function) {
+  void map(MapEntry<String, dynamic> Function(String, dynamic) function) {
     _cache.map(function);
   }
 
   /// This is a wrapper for `get` function which gets a user from cache by userId
   TopicSubscription? getUser(String userId) {
-    return get('user', userId);
+    return get('user', userId) as TopicSubscription?;
   }
 
   /// This is a wrapper for `put` function which puts a user into cache by userId

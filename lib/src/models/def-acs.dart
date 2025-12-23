@@ -9,7 +9,7 @@ class DefAcs {
   DefAcs(this.auth, this.anon);
 
   static DefAcs fromMessage(Map<String, dynamic> msg) {
-    return DefAcs(msg['auth'], msg['anon']);
+    return DefAcs(msg['auth'] as String, msg['anon'] as String);
   }
 
   Map<String, dynamic> toJson() {

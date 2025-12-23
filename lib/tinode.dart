@@ -2,6 +2,7 @@ library tinode;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:rxdart/rxdart.dart';
 import 'package:get_it/get_it.dart';
@@ -26,6 +27,7 @@ import 'package:tinode/src/services/tinode.dart';
 import 'package:tinode/src/models/message.dart';
 import 'package:tinode/src/services/tools.dart';
 import 'package:tinode/src/services/auth.dart';
+import 'package:tinode/src/services/file_service.dart';
 import 'package:tinode/src/topic-fnd.dart';
 import 'package:tinode/src/topic-me.dart';
 import 'package:tinode/src/topic.dart';
@@ -43,13 +45,14 @@ export 'package:tinode/src/models/app-settings.dart';
 export 'package:tinode/src/models/packet-types.dart';
 export 'package:tinode/src/models/packet-data.dart';
 export 'package:tinode/src/models/auth-token.dart';
-export 'package:tinode/src/models/auth-token.dart';
 export 'package:tinode/src/models/credential.dart';
 export 'package:tinode/src/models/set-params.dart';
 export 'package:tinode/src/meta-get-builder.dart';
 export 'package:tinode/src/models/del-range.dart';
 export 'package:tinode/src/models/get-query.dart';
 export 'package:tinode/src/services/tools.dart';
+export 'package:tinode/src/services/file_service.dart';
+export 'package:tinode/src/services/connection.dart' show ConnectionState;
 export 'package:tinode/src/models/def-acs.dart';
 export 'package:tinode/src/sorted-cache.dart';
 export 'package:tinode/src/topic-fnd.dart';
@@ -79,14 +82,17 @@ class Tinode {
   /// Connection service, responsible for establishing a websocket connection to the server
   late ConnectionService _connectionService;
 
+  /// File service for uploads and downloads
+  late FileService _fileService;
+
   /// `onMessage` subscription stored to unsubscribe later
-  StreamSubscription? _onMessageSubscription;
+  StreamSubscription<String>? _onMessageSubscription;
 
   /// `onConnected` subscription stored to unsubscribe later
-  StreamSubscription? _onConnectedSubscription;
+  StreamSubscription<void>? _onConnectedSubscription;
 
   /// `onDisconnect` subscription stored to unsubscribe later
-  StreamSubscription? _onDisconnectedSubscription;
+  StreamSubscription<void>? _onDisconnectedSubscription;
 
   /// `onConnected` event will be triggered when connection opens
   PublishSubject<void> onConnected = PublishSubject<void>();
@@ -113,6 +119,7 @@ class Tinode {
   Tinode(String appName, ConnectionOptions options, bool loggerEnabled) {
     _registerDependencies(options, loggerEnabled);
     _resolveDependencies();
+    _fileService = FileService(options);
 
     _configService.appName = appName;
     _doSubscriptions();
@@ -176,7 +183,7 @@ class Tinode {
     _futureManager.rejectAllFutures(0, 'disconnect');
     _cacheManager.map((String key, dynamic value) {
       if (key.contains('topic:')) {
-        Topic topic = value;
+        Topic topic = value as Topic;
         topic.resetSubscription();
       }
       return MapEntry(key, value);
@@ -206,7 +213,7 @@ class Tinode {
     }
 
     /// Decode map into model
-    var message = ServerMessage.fromMessage(pkt);
+    var message = ServerMessage.fromMessage(pkt as Map<String, dynamic>);
 
     // Send complete packet to listener
     onMessage.add(message);
@@ -230,7 +237,7 @@ class Tinode {
   }
 
   /// Open the connection and send a hello packet to server
-  Future connect() async {
+  Future<dynamic> connect() async {
     _doSubscriptions();
     await _connectionService.connect();
     return hello();
@@ -272,15 +279,11 @@ class Tinode {
   /// * Language
   /// * Platform
   Future<CtrlMessage> hello({String? deviceToken}) async {
-    CtrlMessage ctrl;
-    if (deviceToken != null) {
-      ctrl = await _tinodeService.hello(deviceToken: deviceToken);
-    } else {
-      ctrl = await _tinodeService.hello();
-    }
+    var response = await _tinodeService.hello(deviceToken: deviceToken);
+    CtrlMessage ctrl = response is CtrlMessage ? response : CtrlMessage.fromMessage(response as Map<String, dynamic>);
 
     if (ctrl.params != null) {
-      _configService.setServerConfiguration(ctrl.params);
+      _configService.setServerConfiguration(ctrl.params as Map<String, dynamic>);
     }
     return ctrl;
   }
@@ -293,16 +296,16 @@ class Tinode {
   /// Create or update an account
   ///
   /// * Scheme can be `basic` or `token` or `reset`
-  Future account(String userId, String scheme, String secret, bool login, AccountParams? params) {
+  Future<dynamic> account(String userId, String scheme, String secret, bool login, AccountParams? params) {
     return _tinodeService.account(userId, scheme, secret, login, params);
   }
 
   /// Create a new user. Wrapper for `account` method
-  Future createAccount(String scheme, String secret, bool login, AccountParams? params) {
+  Future<dynamic> createAccount(String scheme, String secret, bool login, AccountParams? params) {
     var promise = account(topic_names.USER_NEW, scheme, secret, login, params);
     if (login) {
       promise = promise.then((dynamic ctrl) {
-        _authService.onLoginSuccessful(ctrl);
+        _authService.onLoginSuccessful(ctrl as CtrlMessage);
         return ctrl;
       });
     }
@@ -311,13 +314,13 @@ class Tinode {
 
   /// Create user with 'basic' authentication scheme and immediately
   /// use it for authentication. Wrapper for `createAccount`
-  Future createAccountBasic(String username, String password, bool login, AccountParams? params) {
+  Future<dynamic> createAccountBasic(String username, String password, bool login, AccountParams? params) {
     var secret = base64.encode(utf8.encode(username + ':' + password));
     return createAccount('basic', secret, login, params);
   }
 
   /// Update account with basic
-  Future updateAccountBasic(String userId, String username, String password, AccountParams? params) {
+  Future<dynamic> updateAccountBasic(String userId, String username, String password, AccountParams? params) {
     var secret = base64.encode(utf8.encode(username + ':' + password));
     return account(userId, 'basic', secret, false, params);
   }
@@ -336,7 +339,7 @@ class Tinode {
   }
 
   /// Wrapper for `login` with token authentication
-  Future loginToken(String token, Map<String, dynamic> cred) {
+  Future<CtrlMessage> loginToken(String token, Map<String, dynamic> cred) {
     return login('token', token, cred);
   }
 
@@ -344,7 +347,7 @@ class Tinode {
   /// * scheme - authentication scheme to reset ex: `basic`
   /// * method - method to use for resetting the secret, such as "email" or "tel"
   /// * value - value of the credential to use, a specific email address or a phone number
-  Future requestResetSecret(String scheme, String method, String value) {
+  Future<CtrlMessage> requestResetSecret(String scheme, String method, String value) {
     var secret = base64.encode(utf8.encode(scheme + ':' + method + ':' + value));
     return login('reset', secret, null);
   }
@@ -355,12 +358,12 @@ class Tinode {
   }
 
   /// Send a topic subscription request
-  Future subscribe(String topicName, GetQuery getParams, SetParams setParams) {
+  Future<dynamic> subscribe(String topicName, GetQuery getParams, SetParams setParams) {
     return _tinodeService.subscribe(topicName, getParams, setParams);
   }
 
   /// Detach and optionally unsubscribe from the topic
-  Future leave(String topicName, bool unsubscribe) {
+  Future<dynamic> leave(String topicName, bool unsubscribe) {
     return _tinodeService.leave(topicName, unsubscribe);
   }
 
@@ -370,56 +373,100 @@ class Tinode {
   }
 
   /// Publish message to topic. The message should be created by `createMessage`
-  Future publishMessage(Message message) {
+  Future<dynamic> publishMessage(Message message) {
     return _tinodeService.publishMessage(message);
   }
 
   /// Request topic metadata
-  Future getMeta(String topicName, GetQuery params) {
+  Future<dynamic> getMeta(String topicName, GetQuery params) {
     return _tinodeService.getMeta(topicName, params);
   }
 
   /// Update topic's metadata: description, subscriptions
-  Future setMeta(String topicName, SetParams params) {
+  Future<dynamic> setMeta(String topicName, SetParams params) {
     return _tinodeService.setMeta(topicName, params);
   }
 
   /// Delete some or all messages in a topic
-  Future deleteMessages(String topicName, List<DelRange> ranges, bool hard) {
+  Future<dynamic> deleteMessages(String topicName, List<DelRange> ranges, bool hard) {
     return _tinodeService.deleteMessages(topicName, ranges, hard);
   }
 
   /// Delete the topic all together. Requires Owner permission
-  Future deleteTopic(String topicName, bool hard) {
+  Future<dynamic> deleteTopic(String topicName, bool hard) {
     return _tinodeService.deleteTopic(topicName, hard);
   }
 
   /// Delete subscription. Requires Share permission
-  Future deleteSubscription(String topicName, String userId) {
+  Future<dynamic> deleteSubscription(String topicName, String userId) {
     return _tinodeService.deleteSubscription(topicName, userId);
   }
 
   /// Delete credential. Always sent on 'me' topic
-  Future deleteCredential(String method, String value) {
+  Future<dynamic> deleteCredential(String method, String value) {
     return _tinodeService.deleteCredential(method, userId);
   }
 
   /// Request to delete account of the current user
-  Future deleteCurrentUser(bool hard) async {
+  Future<dynamic> deleteCurrentUser(bool hard) async {
     var ctrl = _tinodeService.deleteCurrentUser(hard);
     _authService.setUserId(null);
     return ctrl;
   }
 
-  /// Notify server that a message or messages were read or received. Does NOT return promise
-  void note(String topicName, String what, int seq) {
-    _tinodeService.note(topicName, what, seq);
+  /// Notify server that a message or messages were read or received.
+  ///
+  /// [topicName] - The topic to send the notification to
+  /// [what] - Notification type: 'recv' or 'read'
+  /// [seq] - Message sequence ID
+  /// [unread] - Optional total count of unread messages
+  void note(String topicName, String what, int seq, {int? unread}) {
+    _tinodeService.note(topicName, what, seq, unread: unread);
   }
 
-  /// Broadcast a key-press notification to topic subscribers. Used to show
-  /// typing notifications "user X is typing..."
-  void noteKeyPress(String topicName) async {
-    await _tinodeService.noteKeyPress(topicName);
+  /// Broadcast a key-press notification to topic subscribers.
+  ///
+  /// Used to show typing notifications "user X is typing..."
+  ///
+  /// [topicName] - The topic to send the notification to
+  /// [audioRecording] - Set to true for audio recording notification
+  /// [videoRecording] - Set to true for video recording notification
+  Future<void> noteKeyPress(
+    String topicName, {
+    bool audioRecording = false,
+    bool videoRecording = false,
+  }) async {
+    await _tinodeService.noteKeyPress(
+      topicName,
+      audioRecording: audioRecording,
+      videoRecording: videoRecording,
+    );
+  }
+
+  /// Send a video call notification.
+  ///
+  /// Used for WebRTC call signaling through the Tinode server.
+  ///
+  /// [topicName] - The topic (usually P2P) to send the call notification to
+  /// [seq] - Message sequence ID of the call message
+  /// [event] - Call event type from [VideoCallEvent]: 'invite', 'ringing',
+  ///           'accept', 'answer', 'offer', 'ice-candidate', 'hang-up'
+  /// [payload] - Optional payload data (SDP for offer/answer, ICE candidate data)
+  Future<void> noteCall(
+    String topicName,
+    int seq,
+    String event, {
+    Map<String, dynamic>? payload,
+  }) async {
+    await _tinodeService.noteCall(topicName, seq, event, payload: payload);
+  }
+
+  /// Send generic data notification.
+  ///
+  /// [topicName] - The topic to send the notification to
+  /// [payload] - Data payload to send
+  Future<void> noteData(String topicName, Map<String, dynamic> payload) async {
+    await _tinodeService.noteData(topicName, payload);
   }
 
   /// Get a named topic, either pull it from cache or create a new instance
@@ -430,7 +477,7 @@ class Tinode {
 
   /// Check if named topic is already present in cache
   bool isTopicCached(String topicName) {
-    var topic = _cacheManager.get('topic', topicName);
+    final topic = _cacheManager.get('topic', topicName);
     return topic != null;
   }
 
@@ -507,4 +554,135 @@ class Tinode {
     var cont = me.getContact(topicName);
     return cont != null ? cont.acs : null;
   }
+
+  // ============== File Upload/Download API ==============
+
+  /// Get the file service for advanced file operations.
+  ///
+  /// The file service provides streams for monitoring upload/download progress:
+  /// - [FileService.onUploadProgress] - Stream of upload progress updates
+  /// - [FileService.onDownloadProgress] - Stream of download progress updates
+  FileService get fileService => _fileService;
+
+  /// Upload a file to the server.
+  ///
+  /// [fileBytes] - The file content as bytes
+  /// [filename] - The name of the file
+  /// [mimeType] - The MIME type of the file (e.g., 'image/jpeg', 'application/pdf')
+  /// [onProgress] - Optional callback for progress updates
+  ///
+  /// Returns an [UploadResult] containing the URL of the uploaded file.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await tinode.uploadFile(
+  ///   fileBytes: imageBytes,
+  ///   filename: 'photo.jpg',
+  ///   mimeType: 'image/jpeg',
+  ///   onProgress: (progress) {
+  ///     print('Upload: ${progress.percentage}%');
+  ///   },
+  /// );
+  /// print('Uploaded to: ${result.fullUrl}');
+  /// ```
+  Future<UploadResult> uploadFile({
+    required Uint8List fileBytes,
+    required String filename,
+    required String mimeType,
+    void Function(FileProgress)? onProgress,
+  }) {
+    return _fileService.uploadFile(
+      fileBytes: fileBytes,
+      filename: filename,
+      mimeType: mimeType,
+      onProgress: onProgress,
+    );
+  }
+
+  /// Download a file from the server.
+  ///
+  /// [url] - The file URL (can be relative or absolute)
+  /// [onProgress] - Optional callback for progress updates
+  ///
+  /// Returns the file content as bytes.
+  ///
+  /// Example:
+  /// ```dart
+  /// final bytes = await tinode.downloadFile(
+  ///   url: '/v0/file/s/abc123',
+  ///   onProgress: (progress) {
+  ///     if (progress.percentage >= 0) {
+  ///       print('Download: ${progress.percentage}%');
+  ///     }
+  ///   },
+  /// );
+  /// ```
+  Future<Uint8List> downloadFile({
+    required String url,
+    void Function(FileProgress)? onProgress,
+  }) {
+    return _fileService.downloadFile(
+      url: url,
+      onProgress: onProgress,
+    );
+  }
+
+  // ============== Connection State API ==============
+
+  /// Get the current connection state
+  ConnectionState get connectionState => _connectionService.connectionState;
+
+  /// Stream of connection state changes for monitoring connection status.
+  ///
+  /// Use this to update UI or trigger reconnection logic.
+  ///
+  /// Example:
+  /// ```dart
+  /// tinode.onConnectionStateChange.listen((state) {
+  ///   switch (state) {
+  ///     case ConnectionState.connected:
+  ///       print('Connected!');
+  ///       break;
+  ///     case ConnectionState.disconnected:
+  ///       print('Disconnected');
+  ///       break;
+  ///     case ConnectionState.reconnecting:
+  ///       print('Attempting to reconnect...');
+  ///       break;
+  ///     case ConnectionState.connecting:
+  ///       print('Connecting...');
+  ///       break;
+  ///   }
+  /// });
+  /// ```
+  Stream<ConnectionState> get onConnectionStateChange =>
+      _connectionService.onConnectionStateChange.stream;
+
+  /// Enable or disable auto-reconnect.
+  ///
+  /// When enabled, the SDK will automatically attempt to reconnect
+  /// using exponential backoff when the connection is lost.
+  set autoReconnect(bool value) => _connectionService.autoReconnect = value;
+  bool get autoReconnect => _connectionService.autoReconnect;
+
+  /// Set maximum reconnection attempts (0 = unlimited).
+  set maxReconnectAttempts(int value) =>
+      _connectionService.maxReconnectAttempts = value;
+  int get maxReconnectAttempts => _connectionService.maxReconnectAttempts;
+
+  /// Set base delay for exponential backoff (in milliseconds).
+  set baseReconnectDelay(int value) =>
+      _connectionService.baseReconnectDelay = value;
+  int get baseReconnectDelay => _connectionService.baseReconnectDelay;
+
+  /// Set maximum delay between reconnection attempts (in milliseconds).
+  set maxReconnectDelay(int value) =>
+      _connectionService.maxReconnectDelay = value;
+  int get maxReconnectDelay => _connectionService.maxReconnectDelay;
+
+  /// Force a reconnection (disconnect and immediately reconnect).
+  Future<void> reconnect() => _connectionService.reconnect();
+
+  /// Check if currently connecting or reconnecting.
+  bool get isConnecting => _connectionService.isConnecting;
 }

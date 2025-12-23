@@ -207,19 +207,89 @@ class DelPacketData extends PacketData {
   }
 }
 
+/// Note packet data for sending notifications like typing, read receipts, and video calls.
+///
+/// Supported 'what' values:
+/// - 'kp': key press (typing notification)
+/// - 'kpa': audio message recording
+/// - 'kpv': video message recording
+/// - 'recv': message received
+/// - 'read': message read
+/// - 'call': video/audio call signaling
+/// - 'data': generic data notification
 class NotePacketData extends PacketData {
+  /// Topic name
   String? topic;
-  String? what;
-  dynamic seq;
 
-  NotePacketData({this.topic, this.what, this.seq});
+  /// Notification type: 'kp', 'kpa', 'kpv', 'recv', 'read', 'call', 'data'
+  String? what;
+
+  /// Message sequence ID (for recv/read notifications)
+  int? seq;
+
+  /// Total count of unread messages (optional, for recv/read)
+  int? unread;
+
+  /// Event type for video calls: 'invite', 'ringing', 'accept', 'answer',
+  /// 'offer', 'ice-candidate', 'hang-up'
+  String? event;
+
+  /// Payload data (used for call signaling with SDP/ICE data, or data notifications)
+  Map<String, dynamic>? payload;
+
+  NotePacketData({
+    this.topic,
+    this.what,
+    this.seq,
+    this.unread,
+    this.event,
+    this.payload,
+  });
 
   @override
   Map<String, dynamic> toMap() {
-    return {
+    final map = <String, dynamic>{
       'topic': topic,
       'what': what,
-      'seq': seq,
     };
+
+    if (seq != null) {
+      map['seq'] = seq;
+    }
+    if (unread != null) {
+      map['unread'] = unread;
+    }
+    if (event != null) {
+      map['event'] = event;
+    }
+    if (payload != null) {
+      map['payload'] = payload;
+    }
+
+    return map;
   }
+}
+
+/// Video call event types for {note} messages
+class VideoCallEvent {
+  /// Call initiation event
+  static const String invite = 'invite';
+
+  /// Callee is ringing
+  static const String ringing = 'ringing';
+
+  /// Call accepted by callee
+  static const String accept = 'accept';
+
+  /// WebRTC answer SDP
+  static const String answer = 'answer';
+
+  /// WebRTC offer SDP
+  static const String offer = 'offer';
+
+  /// ICE candidate exchange
+  static const String iceCandidate = 'ice-candidate';
+
+  /// Call termination
+  static const String hangUp = 'hang-up';
 }

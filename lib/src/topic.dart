@@ -164,7 +164,7 @@ class Topic {
   }
 
   // To set _subscribed manually, Used in unit tests
-  set isSubscribed(value) {
+  set isSubscribed(bool value) {
     _subscribed = value;
   }
 
@@ -253,11 +253,11 @@ class Topic {
       }
       if (ctrl != null) {
         message.ts = ctrl.ts;
-        var seq = ctrl.params['seq'];
+        var seq = ctrl.params['seq'] as int?;
         if (seq != null) {
           message.setStatus(message_status.SENT);
+          routeData(message.asDataMessage(_authService.userId ?? '', seq));
         }
-        routeData(message.asDataMessage(_authService.userId ?? '', seq));
       }
       return ctrl;
     } catch (e) {
@@ -284,11 +284,11 @@ class Topic {
       _cacheManager.delete('topic', name ?? '');
       _gone();
     }
-    return CtrlMessage.fromMessage(ctrl);
+    return CtrlMessage.fromMessage(ctrl as Map<String, dynamic>);
   }
 
   /// Request topic metadata from the serve
-  Future getMeta(GetQuery params) {
+  Future<dynamic> getMeta(GetQuery params) {
     // Send {get} message, return promise.
     return _tinodeService.getMeta(name ?? '', params);
   }
@@ -297,7 +297,7 @@ class Topic {
   ///
   /// `limit` - number of messages to get.
   /// `forward` if true, request newer messages.
-  Future getMessagesPage(int limit, bool forward) {
+  Future<dynamic> getMessagesPage(int limit, bool forward) {
     var query = startMetaQuery();
     var future = getMeta(query.build());
 
@@ -306,7 +306,7 @@ class Topic {
     } else {
       query.withEarlierData(limit);
       future = future.then((response) {
-        var ctrl = CtrlMessage.fromMessage(response);
+        var ctrl = CtrlMessage.fromMessage(response as Map<String, dynamic>);
         if (ctrl.params != null && (ctrl.params['count'] == null || ctrl.params['count'] == 0)) {
           _noEarlierMsgs = true;
         }
@@ -323,7 +323,8 @@ class Topic {
     }
 
     // Send Set message, handle async response.
-    var ctrl = await _tinodeService.setMeta(name ?? '', params);
+    var response = await _tinodeService.setMeta(name ?? '', params);
+    var ctrl = response is CtrlMessage ? response : CtrlMessage.fromMessage(response as Map<String, dynamic>);
 
     if (ctrl.code! >= 300) {
       // Not modified
@@ -334,7 +335,7 @@ class Topic {
       params.sub!.topic = name;
 
       if (ctrl.params != null && ctrl.params['acs'] != null) {
-        params.sub!.acs = AccessMode(ctrl.params['acs']);
+        params.sub!.acs = AccessMode(ctrl.params['acs'] as Map<String, dynamic>);
         params.sub!.updated = ctrl.ts;
       }
 
@@ -351,7 +352,7 @@ class Topic {
 
     if (params.desc != null) {
       if (ctrl.params != null && ctrl.params['acs'] != null) {
-        params.desc!.acs = AccessMode(ctrl.params['acs']);
+        params.desc!.acs = AccessMode(ctrl.params['acs'] as Map<String, dynamic>);
         params.desc!.updated = ctrl.ts;
       }
       processMetaDesc(params.desc!);
@@ -381,8 +382,8 @@ class Topic {
   }
 
   /// Archive or un-archive the topic. Wrapper for Tinode.setMeta
-  Future archive(bool archive) {
-    if (private && private.arch == archive) {
+  Future<dynamic> archive(bool archive) {
+    if (private != null && private is Map && private['arch'] == archive) {
       return Future.error(Exception('Cannot publish on inactive topic'));
     }
     return setMeta(SetParams(desc: TopicDescription(private: {'archive': archive ? true : DEL_CHAR})));
@@ -429,10 +430,10 @@ class Topic {
     }
 
     var response = await result;
-    var ctrl = CtrlMessage.fromMessage(response);
+    var ctrl = CtrlMessage.fromMessage(response as Map<String, dynamic>);
 
-    if (ctrl.params['del'] > _maxDel) {
-      _maxDel = ctrl.params['del'];
+    if (ctrl.params != null && (ctrl.params['del'] as int? ?? 0) > _maxDel) {
+      _maxDel = ctrl.params['del'] as int;
     }
 
     ranges.forEach((r) {
@@ -453,7 +454,7 @@ class Topic {
   Future<CtrlMessage> deleteMessagesAll(bool hard) {
     if (_maxSeq == 0 || _maxSeq <= 0) {
       // There are no messages to delete.
-      return Future.value();
+      return Future.value(CtrlMessage());
     }
     return deleteMessages([DelRange(low: 1, hi: _maxSeq + 1, all: true)], hard);
   }
@@ -490,7 +491,7 @@ class Topic {
     var ctrl = await _tinodeService.deleteTopic(name ?? '', hard);
     resetSubscription();
     _gone();
-    return CtrlMessage.fromMessage(ctrl);
+    return CtrlMessage.fromMessage(ctrl as Map<String, dynamic>);
   }
 
   /// Delete subscription. Requires Share permission. Wrapper for Tinode.deleteSubscription
@@ -504,7 +505,7 @@ class Topic {
     _users.remove(userId);
     // Notify listeners
     onSubsUpdated.add(_users.values.toList());
-    return CtrlMessage.fromMessage((ctrl));
+    return CtrlMessage.fromMessage(ctrl as Map<String, dynamic>);
   }
 
   /// Send a read/recv notification
@@ -651,7 +652,7 @@ class Topic {
 
   /// Check if the given seq Id is id of the most recent message
   /// seqId id of the message to check
-  bool isNewMessage(seqId) {
+  bool isNewMessage(int seqId) {
     return _maxSeq <= seqId;
   }
 
@@ -689,7 +690,7 @@ class Topic {
 
   /// Check if topic is archived, i.e. private.arch == true.
   bool isArchived() {
-    return private != null && private['arch'] ? true : false;
+    return private != null && private is Map && private['arch'] == true;
   }
 
   /// Check if topic is a channel

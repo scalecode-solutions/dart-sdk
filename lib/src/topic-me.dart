@@ -329,7 +329,7 @@ class TopicMe extends Topic {
 
     // Send {del} message, return promise
     var response = await _tinodeService.deleteCredential(method, value);
-    var ctrl = CtrlMessage.fromMessage(response);
+    var ctrl = CtrlMessage.fromMessage(response as Map<String, dynamic>);
 
     // Remove deleted credential from the cache.
     var index = _credentials.indexWhere((el) {
@@ -351,7 +351,8 @@ class TopicMe extends Topic {
   /// Update a cached contact with new read/received/message count
   void setMsgReadRecv(String contactName, String what, int seq, DateTime? ts) {
     var cont = _contacts[contactName];
-    var oldVal, doUpdate = false;
+    int? oldVal;
+    var doUpdate = false;
 
     if (cont != null) {
       this.seq = seq;
@@ -432,7 +433,7 @@ class TopicMe extends Topic {
   /// Check if contact is archived, i.e. contact.private.arch == true.
   bool? isContactArchived(String topicName) {
     var cont = _contacts[topicName];
-    return cont != null ? ((cont.private && cont.private.arch) ? true : false) : null;
+    return cont != null ? ((cont.private != null && cont.private is Map && cont.private['arch'] == true) ? true : false) : null;
   }
 
   /// Get the user's credentials: email, phone, etc.

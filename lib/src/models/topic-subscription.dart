@@ -13,8 +13,8 @@ class Seen {
 
   static Seen fromMessages(Map<String, dynamic> msg) {
     return Seen(
-      ua: msg['ua'],
-      when: msg['when'] != null ? DateTime.parse(msg['when']) : DateTime.now(),
+      ua: msg['ua'] as String?,
+      when: msg['when'] != null ? DateTime.parse(msg['when'] as String) : DateTime.now(),
     );
   }
 }
@@ -47,6 +47,9 @@ class TopicSubscription {
   /// In case some messages were deleted, the greatest Id of a deleted message, optional
   int? clear;
 
+  /// Application-defined payload writable by the system administration
+  dynamic trusted;
+
   /// Application-defined user's 'public' object, absent when querying P2P topics
   dynamic public;
 
@@ -73,6 +76,9 @@ class TopicSubscription {
   /// can be used only when querying 'me' topic
   int? seq;
 
+  /// Messages are deleted up to this ID
+  int? delId;
+
   /// If this is a P2P topic, info on when the peer was last online
   ///
   /// can be used only when querying 'me' topic
@@ -92,11 +98,13 @@ class TopicSubscription {
     this.read,
     this.recv,
     this.clear,
+    this.trusted,
     this.public,
     this.private,
     this.online,
     this.topic,
     this.seq,
+    this.delId,
     this.seen,
     this.noForwarding,
     this.deleted,
@@ -107,23 +115,25 @@ class TopicSubscription {
 
   static TopicSubscription fromMessage(Map<String, dynamic> msg) {
     return TopicSubscription(
-      user: msg['user'],
-      updated: msg['updated'] != null ? DateTime.parse(msg['updated']) : null,
-      touched: msg['touched'] != null ? DateTime.parse(msg['touched']) : null,
-      deleted: msg['deleted'] != null ? DateTime.parse(msg['deleted']) : null,
-      created: msg['created'] != null ? DateTime.parse(msg['created']) : null,
-      acs: msg['acs'] != null ? AccessMode(msg['acs']) : null,
-      read: msg['read'],
-      recv: msg['recv'],
-      clear: msg['clear'],
+      user: msg['user'] as String?,
+      updated: msg['updated'] != null ? DateTime.parse(msg['updated'] as String) : null,
+      touched: msg['touched'] != null ? DateTime.parse(msg['touched'] as String) : null,
+      deleted: msg['deleted'] != null ? DateTime.parse(msg['deleted'] as String) : null,
+      created: msg['created'] != null ? DateTime.parse(msg['created'] as String) : null,
+      acs: msg['acs'] != null ? AccessMode(msg['acs'] as Map<String, dynamic>) : null,
+      read: msg['read'] as int?,
+      recv: msg['recv'] as int?,
+      clear: msg['clear'] as int?,
+      trusted: msg['trusted'],
       public: msg['public'],
       private: msg['private'],
-      online: msg['online'],
-      topic: msg['topic'],
-      seq: msg['seq'],
-      seen: msg['seen'] != null ? Seen.fromMessages(msg['seen']) : null,
-      noForwarding: msg['noForwarding'] ?? false,
-      mode: msg['mode'],
+      online: msg['online'] as bool?,
+      topic: msg['topic'] as String?,
+      seq: msg['seq'] as int?,
+      delId: msg['del_id'] as int?,
+      seen: msg['seen'] != null ? Seen.fromMessages(msg['seen'] as Map<String, dynamic>) : null,
+      noForwarding: (msg['noForwarding'] as bool?) ?? false,
+      mode: msg['mode'] as String?,
     );
   }
 
@@ -138,11 +148,13 @@ class TopicSubscription {
       read: read,
       recv: recv,
       clear: clear,
+      trusted: trusted,
       public: public,
       private: private,
       online: online,
       topic: topic,
       seq: seq,
+      delId: delId,
       seen: seen,
       noForwarding: noForwarding,
       mode: mode,
@@ -155,6 +167,7 @@ class TopicSubscription {
       clear: clear,
       created: created,
       noForwarding: noForwarding,
+      trusted: trusted,
       private: private,
       public: public,
       read: read,

@@ -132,7 +132,7 @@ class MetaGetBuilder {
 
   /// Construct parameters
   GetQuery build() {
-    var what = [];
+    var what = <String>[];
     Map<String, dynamic>? params = <String, dynamic>{};
     ['data', 'sub', 'desc', 'tags', 'cred', 'del'].forEach((key) {
       if (this.what.containsKey(key)) {

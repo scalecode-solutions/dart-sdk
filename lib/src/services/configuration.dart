@@ -52,14 +52,14 @@ class ConfigService {
 
   void setServerConfiguration(Map<String, dynamic> configuration) {
     _serverConfiguration = ServerConfiguration(
-      build: configuration['build'],
-      maxFileUploadSize: configuration['maxFileUploadSize'],
-      maxMessageSize: configuration['maxMessageSize'],
-      maxSubscriberCount: configuration['maxSubscriberCount'],
-      maxTagCount: configuration['maxTagCount'],
-      maxTagLength: configuration['maxTagLength'],
-      minTagLength: configuration['minTagLength'],
-      ver: configuration['ver'],
+      build: configuration['build'] as String?,
+      maxFileUploadSize: configuration['maxFileUploadSize'] as int?,
+      maxMessageSize: configuration['maxMessageSize'] as int?,
+      maxSubscriberCount: configuration['maxSubscriberCount'] as int?,
+      maxTagCount: configuration['maxTagCount'] as int?,
+      maxTagLength: configuration['maxTagLength'] as int?,
+      minTagLength: configuration['minTagLength'] as int?,
+      ver: configuration['ver'] as String?,
     );
   }
 }

@@ -43,7 +43,7 @@ class AccessMode {
   /// Combination of want and given
   late int mode;
 
-  int operator [](other) {
+  int operator [](String other) {
     switch (other) {
       case 'mode':
         return mode;
@@ -59,12 +59,12 @@ class AccessMode {
   /// Create new instance by passing an `AccessMode` or `Map<String, dynamic>`
   AccessMode(dynamic acs) {
     if (acs != null) {
-      _given = acs['given'] is int ? acs['given'] : AccessMode.decode(acs['given']);
-      _want = acs['want'] is int ? acs['want'] : AccessMode.decode(acs['want']);
+      _given = acs['given'] is int ? acs['given'] as int : (AccessMode.decode(acs['given']) ?? 0);
+      _want = acs['want'] is int ? acs['want'] as int : (AccessMode.decode(acs['want']) ?? 0);
 
       if (acs['mode'] != null) {
         if (acs['mode'] is int) {
-          mode = acs['mode'];
+          mode = acs['mode'] as int;
         } else {
           mode = AccessMode.decode(acs['mode']) ?? 0;
         }
@@ -84,7 +84,7 @@ class AccessMode {
       return NONE;
     }
 
-    var bitmask = {
+    var bitmask = <String, int>{
       'J': JOIN,
       'R': READ,
       'W': WRITE,
@@ -98,8 +98,10 @@ class AccessMode {
     var m0 = NONE;
 
     if (mode != null) {
-      for (var i = 0; i < mode.length; i++) {
-        var bit = bitmask[mode[i].toUpperCase()];
+      final int length = mode.length as int;
+      for (var i = 0; i < length; i++) {
+        final String key = (mode[i] as String).toUpperCase();
+        final int? bit = bitmask[key];
         if (bit == null) {
           // Unrecognized bit, skip.
           continue;
@@ -131,10 +133,6 @@ class AccessMode {
 
   /// Updates mode with newly given permissions
   static int update(int val, String upd) {
-    if (!(upd is String)) {
-      return val;
-    }
-
     var action = upd[0];
 
     if (action == '+' || action == '-') {

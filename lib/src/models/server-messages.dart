@@ -15,11 +15,11 @@ class ServerMessage {
 
   static ServerMessage fromMessage(Map<String, dynamic> msg) {
     return ServerMessage(
-      ctrl: msg['ctrl'] != null ? CtrlMessage.fromMessage(msg['ctrl']) : null,
-      meta: msg['meta'] != null ? MetaMessage.fromMessage(msg['meta']) : null,
-      data: msg['data'] != null ? DataMessage.fromMessage(msg['data']) : null,
-      pres: msg['pres'] != null ? PresMessage.fromMessage(msg['pres']) : null,
-      info: msg['info'] != null ? InfoMessage.fromMessage(msg['info']) : null,
+      ctrl: msg['ctrl'] != null ? CtrlMessage.fromMessage(msg['ctrl'] as Map<String, dynamic>) : null,
+      meta: msg['meta'] != null ? MetaMessage.fromMessage(msg['meta'] as Map<String, dynamic>) : null,
+      data: msg['data'] != null ? DataMessage.fromMessage(msg['data'] as Map<String, dynamic>) : null,
+      pres: msg['pres'] != null ? PresMessage.fromMessage(msg['pres'] as Map<String, dynamic>) : null,
+      info: msg['info'] != null ? InfoMessage.fromMessage(msg['info'] as Map<String, dynamic>) : null,
     );
   }
 }
@@ -53,12 +53,12 @@ class CtrlMessage {
 
   static CtrlMessage fromMessage(Map<String, dynamic> msg) {
     return CtrlMessage(
-      id: msg['id'],
-      code: msg['code'],
-      text: msg['text'],
-      topic: msg['topic'],
+      id: msg['id'] as String?,
+      code: msg['code'] as int?,
+      text: msg['text'] as String?,
+      topic: msg['topic'] as String?,
       params: msg['params'],
-      ts: msg['ts'],
+      ts: msg['ts'] as DateTime?,
     );
   }
 }
@@ -88,22 +88,26 @@ class MetaMessage {
   /// Latest applicable 'delete' transaction
   final DeleteTransaction? del;
 
-  MetaMessage({this.id, this.topic, this.ts, this.desc, this.sub, this.tags, this.cred, this.del});
+  /// Auxiliary data, writable by topic managers, readable by subscribers
+  final Map<String, dynamic>? aux;
+
+  MetaMessage({this.id, this.topic, this.ts, this.desc, this.sub, this.tags, this.cred, this.del, this.aux});
 
   static MetaMessage fromMessage(Map<String, dynamic> msg) {
-    List<dynamic>? sub = msg['sub'];
+    List<dynamic>? sub = msg['sub'] as List<dynamic>?;
 
     return MetaMessage(
-      id: msg['id'],
-      topic: msg['topic'],
-      ts: msg['ts'],
-      desc: msg['desc'] != null ? TopicDescription.fromMessage(msg['desc']) : null,
-      sub: sub != null && sub.length != null ? sub.map((sub) => TopicSubscription.fromMessage(sub)).toList() : [],
-      tags: msg['tags']?.cast<String>(),
-      cred: msg['cred'] != null && msg['cred'].length > 0
-          ? msg['cred'].map((dynamic cred) => Credential.fromMessage(cred)).toList().cast<Credential>()
+      id: msg['id'] as String?,
+      topic: msg['topic'] as String?,
+      ts: msg['ts'] as DateTime?,
+      desc: msg['desc'] != null ? TopicDescription.fromMessage(msg['desc'] as Map<String, dynamic>) : null,
+      sub: sub != null ? sub.map((sub) => TopicSubscription.fromMessage(sub as Map<String, dynamic>)).toList() : [],
+      tags: (msg['tags'] as List<dynamic>?)?.cast<String>(),
+      cred: msg['cred'] != null && (msg['cred'] as List<dynamic>).isNotEmpty
+          ? (msg['cred'] as List<dynamic>).map((dynamic cred) => Credential.fromMessage(cred as Map<String, dynamic>)).toList().cast<Credential>()
           : [],
-      del: msg['del'] != null ? DeleteTransaction.fromMessage(msg['del']) : null,
+      del: msg['del'] != null ? DeleteTransaction.fromMessage(msg['del'] as Map<String, dynamic>) : null,
+      aux: msg['aux'] as Map<String, dynamic>?,
     );
   }
 }
@@ -125,7 +129,7 @@ class DataMessage {
   int? seq;
 
   /// object, application-defined content exactly as published by the user in the {pub} message
-  final dynamic? content;
+  final dynamic content;
 
   bool? noForwarding = false;
 
@@ -144,14 +148,14 @@ class DataMessage {
 
   static DataMessage fromMessage(Map<String, dynamic> msg) {
     return DataMessage(
-      topic: msg['topic'],
-      from: msg['from'],
-      head: msg['head'],
-      ts: msg['ts'],
-      seq: msg['seq'],
+      topic: msg['topic'] as String?,
+      from: msg['from'] as String?,
+      head: msg['head'] as Map<String, dynamic>?,
+      ts: msg['ts'] as DateTime?,
+      seq: msg['seq'] as int?,
       content: msg['content'],
-      noForwarding: msg['noForwarding'] ?? false,
-      hi: msg['hi'],
+      noForwarding: (msg['noForwarding'] as bool?) ?? false,
+      hi: msg['hi'] as int?,
     );
   }
 }
@@ -204,50 +208,77 @@ class PresMessage {
   });
 
   static PresMessage fromMessage(Map<String, dynamic> msg) {
+    final delseqList = msg['delseq'] as List<dynamic>?;
     return PresMessage(
-      topic: msg['msg'],
-      src: msg['src'],
-      what: msg['what'],
-      seq: msg['seq'],
-      clear: msg['clear'],
+      topic: msg['msg'] as String?,
+      src: msg['src'] as String?,
+      what: msg['what'] as String?,
+      seq: msg['seq'] as int?,
+      clear: msg['clear'] as int?,
       delseq:
-          msg['delseq'] != null && msg['delseq'].length != null ? msg['delseq'].map((seq) => DeleteTransactionRange.fromMessage(seq)).toList() : [],
-      ua: msg['ua'],
-      act: msg['act'],
-      tgt: msg['tgt'],
-      acs: msg['acs'] != null ? AccessMode(msg['acs']) : null,
-      dacs: msg['dacs'] != null ? AccessMode(msg['dacs']) : null,
+          delseqList != null ? delseqList.map((seq) => DeleteTransactionRange.fromMessage(seq as Map<String, dynamic>)).toList() : [],
+      ua: msg['ua'] as String?,
+      act: msg['act'] as String?,
+      tgt: msg['tgt'] as String?,
+      acs: msg['acs'] != null ? AccessMode(msg['acs'] as Map<String, dynamic>) : null,
+      dacs: msg['dacs'] != null ? AccessMode(msg['dacs'] as Map<String, dynamic>) : null,
     );
   }
 }
 
+/// Info message received from server - forwarded client notifications.
+///
+/// Used for typing notifications, read/recv receipts, and video call signaling.
 class InfoMessage {
-  /// topic affected, always present
+  /// Topic affected, always present
   final String? topic;
 
-  /// id of the user who published the message, always present
+  /// Source topic where the event occurred (present when topic is 'me')
+  final String? src;
+
+  /// ID of the user who published the message, always present
   final String? from;
 
-  /// string, one of "kp", "recv", "read", see client-side {note},
+  /// Notification type: 'kp', 'kpa', 'kpv', 'recv', 'read', 'call', 'data'
   final String? what;
 
   /// ID of the message that client has acknowledged,
-  /// guaranteed 0 < read <= recv <= {ctrl.params.seq}; present for rcpt & read
+  /// guaranteed 0 < read <= recv <= {ctrl.params.seq}; present for recv & read
   final int? seq;
+
+  /// Event type for video calls: 'invite', 'ringing', 'accept', 'answer',
+  /// 'offer', 'ice-candidate', 'hang-up'
+  final String? event;
+
+  /// Payload data (used for call signaling with SDP/ICE data)
+  final Map<String, dynamic>? payload;
 
   InfoMessage({
     this.topic,
+    this.src,
     this.from,
     this.what,
     this.seq,
+    this.event,
+    this.payload,
   });
 
   static InfoMessage fromMessage(Map<String, dynamic> msg) {
     return InfoMessage(
-      topic: msg['topic'],
-      from: msg['from'],
-      what: msg['what'],
-      seq: msg['seq'],
+      topic: msg['topic'] as String?,
+      src: msg['src'] as String?,
+      from: msg['from'] as String?,
+      what: msg['what'] as String?,
+      seq: msg['seq'] as int?,
+      event: msg['event'] as String?,
+      payload: msg['payload'] as Map<String, dynamic>?,
     );
   }
+
+  /// Check if this is a video call event
+  bool get isCallEvent => what == 'call' && event != null;
+
+  /// Check if this is a typing notification
+  bool get isTypingNotification =>
+      what == 'kp' || what == 'kpa' || what == 'kpv';
 }

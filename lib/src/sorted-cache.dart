@@ -48,7 +48,7 @@ class SortedCache<T> {
   /// Insert element into a sorted array
   List<T> insertSorted(T element, List<T> array) {
     var found = findNearest(element, array, false);
-    final int idx = found['idx'];
+    final int idx = found['idx'] as int;
     if (idx >= 0 && idx <= array.length) {
       if (idx < array.length && found['exact'] == true && unique) {
         // replace element
@@ -100,7 +100,7 @@ class SortedCache<T> {
   }
 
   /// Apply given function `callback` to all elements of the buffer
-  void forEach(Function(T, int) callback, int? startIndex, int? beforeIdx) {
+  void forEach(void Function(T, int) callback, int? startIndex, int? beforeIdx) {
     startIndex = startIndex ?? 0;
     beforeIdx = beforeIdx ?? buffer.length;
     for (var i = startIndex; i < beforeIdx; i++) {
@@ -111,6 +111,6 @@ class SortedCache<T> {
   ///  Find element in buffer using buffer's comparison function
   int find(T element, bool nearest) {
     var found = findNearest(element, buffer, !nearest);
-    return found['idx'];
+    return found['idx'] as int;
   }
 }

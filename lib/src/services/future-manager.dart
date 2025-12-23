@@ -17,11 +17,9 @@ class FutureManager {
   }
 
   Future<dynamic> makeFuture(String id) {
-    var completer = Completer();
-    if (id != null) {
-      _pendingFutures[id] = FutureCallback(completer: completer, ts: DateTime.now());
-    }
-    return completer.future;
+    var completer = Completer<dynamic>();
+    _pendingFutures[id] = FutureCallback(completer: completer, ts: DateTime.now());
+      return completer.future;
   }
 
   void execFuture(String? id, int code, dynamic onOK, String? errorText) {
