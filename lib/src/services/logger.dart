@@ -1,4 +1,4 @@
-import 'package:tinode/src/services/configuration.dart';
+import 'package:tindarts_sdk/src/services/configuration.dart';
 import 'package:get_it/get_it.dart';
 
 class LoggerService {

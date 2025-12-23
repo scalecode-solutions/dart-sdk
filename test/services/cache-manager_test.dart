@@ -1,17 +1,17 @@
 import 'package:get_it/get_it.dart';
 import 'package:test/test.dart';
 
-import 'package:tinode/src/models/connection-options.dart';
-import 'package:tinode/src/models/topic-subscription.dart';
-import 'package:tinode/src/services/packet-generator.dart';
-import 'package:tinode/src/services/future-manager.dart';
-import 'package:tinode/src/services/cache-manager.dart';
-import 'package:tinode/src/services/configuration.dart';
-import 'package:tinode/src/services/connection.dart';
-import 'package:tinode/src/services/logger.dart';
-import 'package:tinode/src/services/tinode.dart';
-import 'package:tinode/src/services/auth.dart';
-import 'package:tinode/src/topic.dart';
+import 'package:tindarts_sdk/src/models/connection-options.dart';
+import 'package:tindarts_sdk/src/models/topic-subscription.dart';
+import 'package:tindarts_sdk/src/services/packet-generator.dart';
+import 'package:tindarts_sdk/src/services/future-manager.dart';
+import 'package:tindarts_sdk/src/services/cache-manager.dart';
+import 'package:tindarts_sdk/src/services/configuration.dart';
+import 'package:tindarts_sdk/src/services/connection.dart';
+import 'package:tindarts_sdk/src/services/logger.dart';
+import 'package:tindarts_sdk/src/services/tinode.dart';
+import 'package:tindarts_sdk/src/services/auth.dart';
+import 'package:tindarts_sdk/src/topic.dart';
 
 void main() {
   GetIt.I.registerSingleton<ConfigService>(ConfigService(false));

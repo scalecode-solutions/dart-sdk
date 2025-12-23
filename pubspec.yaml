@@ -1,8 +1,8 @@
-name: tinode
+name: tindarts_sdk
 description: >
-  This SDK implements Tinode client-side protocol for multi-platform 
-  applications based on Dart. Supports Flutter mobile, Flutter desktop, 
-  and pure Dart CLI/server applications.
+  Modern Dart SDK for Tinode chat server. Implements client-side protocol 
+  for multi-platform applications. Supports Flutter mobile, Flutter desktop, 
+  Flutter web, and pure Dart CLI/server applications.
 version: 2.0.0
 homepage: https://github.com/scalecode-solutions/dart-sdk
 repository: https://github.com/scalecode-solutions/dart-sdk

@@ -2,20 +2,20 @@ import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 import 'dart:math';
 
-import 'package:tinode/src/models/topic-names.dart' as topic_names;
-import 'package:tinode/src/models/topic-subscription.dart';
-import 'package:tinode/src/models/topic-description.dart';
-import 'package:tinode/src/models/server-messages.dart';
-import 'package:tinode/src/services/cache-manager.dart';
-import 'package:tinode/src/models/contact-update.dart';
-import 'package:tinode/src/models/access-mode.dart';
-import 'package:tinode/src/models/credential.dart';
-import 'package:tinode/src/services/logger.dart';
-import 'package:tinode/src/services/tinode.dart';
-import 'package:tinode/src/services/tools.dart';
-import 'package:tinode/src/models/message.dart';
-import 'package:tinode/src/models/values.dart';
-import 'package:tinode/src/topic.dart';
+import 'package:tindarts_sdk/src/models/topic-names.dart' as topic_names;
+import 'package:tindarts_sdk/src/models/topic-subscription.dart';
+import 'package:tindarts_sdk/src/models/topic-description.dart';
+import 'package:tindarts_sdk/src/models/server-messages.dart';
+import 'package:tindarts_sdk/src/services/cache-manager.dart';
+import 'package:tindarts_sdk/src/models/contact-update.dart';
+import 'package:tindarts_sdk/src/models/access-mode.dart';
+import 'package:tindarts_sdk/src/models/credential.dart';
+import 'package:tindarts_sdk/src/services/logger.dart';
+import 'package:tindarts_sdk/src/services/tinode.dart';
+import 'package:tindarts_sdk/src/services/tools.dart';
+import 'package:tindarts_sdk/src/models/message.dart';
+import 'package:tindarts_sdk/src/models/values.dart';
+import 'package:tindarts_sdk/src/topic.dart';
 
 /// Special case of Topic for managing data of the current user, including contact list
 class TopicMe extends Topic {

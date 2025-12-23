@@ -1,10 +1,10 @@
 import 'package:get_it/get_it.dart';
 
-import 'package:tinode/src/models/packet-types.dart' as packet_types;
-import 'package:tinode/src/services/configuration.dart';
-import 'package:tinode/src/models/packet-data.dart';
-import 'package:tinode/src/services/tools.dart';
-import 'package:tinode/src/models/packet.dart';
+import 'package:tindarts_sdk/src/models/packet-types.dart' as packet_types;
+import 'package:tindarts_sdk/src/services/configuration.dart';
+import 'package:tindarts_sdk/src/models/packet-data.dart';
+import 'package:tindarts_sdk/src/services/tools.dart';
+import 'package:tindarts_sdk/src/models/packet.dart';
 
 class PacketGenerator {
   late ConfigService _configService;

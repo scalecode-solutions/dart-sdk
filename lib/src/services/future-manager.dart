@@ -1,9 +1,9 @@
 import 'package:get_it/get_it.dart';
 import 'dart:async';
 
-import 'package:tinode/src/models/future-callback.dart';
-import 'package:tinode/src/services/configuration.dart';
-import 'package:tinode/src/services/logger.dart';
+import 'package:tindarts_sdk/src/models/future-callback.dart';
+import 'package:tindarts_sdk/src/services/configuration.dart';
+import 'package:tindarts_sdk/src/services/logger.dart';
 
 class FutureManager {
   final Map<String, FutureCallback> _pendingFutures = {};

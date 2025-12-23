@@ -5,9 +5,9 @@ import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 import 'dart:io';
 
-import 'package:tinode/src/models/connection-options.dart';
-import 'package:tinode/src/services/logger.dart';
-import 'package:tinode/src/services/tools.dart';
+import 'package:tindarts_sdk/src/models/connection-options.dart';
+import 'package:tindarts_sdk/src/services/logger.dart';
+import 'package:tindarts_sdk/src/services/tools.dart';
 
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:web_socket_channel/io.dart';

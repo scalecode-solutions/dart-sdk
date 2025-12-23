@@ -1,4 +1,4 @@
-import 'package:tinode/src/models/packet-data.dart';
+import 'package:tindarts_sdk/src/models/packet-data.dart';
 
 class Packet {
   String? id;

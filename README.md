@@ -23,23 +23,23 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  tinode: ^2.0.0
+  tindarts_sdk: ^2.0.0
 ```
 
 Or run:
 
 ```bash
 # For Dart applications
-dart pub add tinode
+dart pub add tindarts_sdk
 
 # For Flutter applications
-flutter pub add tinode
+flutter pub add tindarts_sdk
 ```
 
 ## Quick Start
 
 ```dart
-import 'package:tinode/tinode.dart';
+import 'package:tindarts_sdk/tinode.dart';
 
 void main() async {
   // Create connection options

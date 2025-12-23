@@ -1,12 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'package:tinode/src/models/message-status.dart' as message_status;
-import 'package:tinode/src/models/packet-types.dart' as packet_types;
-import 'package:tinode/src/services/packet-generator.dart';
-import 'package:tinode/src/models/server-messages.dart';
-import 'package:tinode/src/models/packet-data.dart';
-import 'package:tinode/src/models/packet.dart';
+import 'package:tindarts_sdk/src/models/message-status.dart' as message_status;
+import 'package:tindarts_sdk/src/models/packet-types.dart' as packet_types;
+import 'package:tindarts_sdk/src/services/packet-generator.dart';
+import 'package:tindarts_sdk/src/models/server-messages.dart';
+import 'package:tindarts_sdk/src/models/packet-data.dart';
+import 'package:tindarts_sdk/src/models/packet.dart';
 
 class Message {
   bool echo;

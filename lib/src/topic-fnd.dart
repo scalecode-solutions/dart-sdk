@@ -1,9 +1,9 @@
-import 'package:tinode/src/models/topic-names.dart' as topic_names;
-import 'package:tinode/src/models/topic-subscription.dart';
-import 'package:tinode/src/models/server-messages.dart';
-import 'package:tinode/src/models/set-params.dart';
-import 'package:tinode/src/models/message.dart';
-import 'package:tinode/src/topic.dart';
+import 'package:tindarts_sdk/src/models/topic-names.dart' as topic_names;
+import 'package:tindarts_sdk/src/models/topic-subscription.dart';
+import 'package:tindarts_sdk/src/models/server-messages.dart';
+import 'package:tindarts_sdk/src/models/set-params.dart';
+import 'package:tindarts_sdk/src/models/message.dart';
+import 'package:tindarts_sdk/src/topic.dart';
 
 /// special case of Topic for searching for contacts and group topics
 class TopicFnd extends Topic {
