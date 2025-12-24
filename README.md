@@ -4,7 +4,7 @@
 
 A modern Dart SDK for the [Tinode](https://github.com/tinode/chat) instant messaging platform. This SDK implements the Tinode client-side protocol for building chat applications with Dart and Flutter.
 
-> **Note:** This is a modernized fork of the [original tinode/dart-sdk](https://github.com/tinode/dart-sdk), updated for Dart 3.x, full null safety, and Tinode server v0.25.
+> **Note:** This is a modernized fork of the [original tinode/dart-sdk](https://github.com/tinode/dart-sdk) (archived by Tinode on Nov 18, 2025), updated for Dart 3.x, full null safety, and Tinode server v0.25.
 
 ## Features
 
