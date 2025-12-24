@@ -210,7 +210,7 @@ class TinodeService {
 
   /// Create or update an account
   Future<dynamic> account(String userId, String scheme, String secret, bool login, AccountParams? params) {
-    final Packet? packet = _packetGenerator.generate(packet_types.Acc, null);
+    final packet = _packetGenerator.generate(packet_types.Acc, null);
     final data = packet.data as AccPacketData;
     data.user = userId;
     data.login = login;

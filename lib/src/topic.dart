@@ -801,7 +801,7 @@ class Topic {
 
         if (user == null) {
           // Update for an unknown user: notification of a new subscription.
-          final AccessMode? acs = AccessMode(null).updateAll(pres.dacs);
+          final acs = AccessMode(null).updateAll(pres.dacs);
           if (acs.mode != NONE) {
             user = _cacheManager.getUser(userId ?? '');
 

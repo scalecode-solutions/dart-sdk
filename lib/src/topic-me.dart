@@ -294,7 +294,7 @@ class TopicMe extends Topic {
         // New subscriptions and deleted/banned subscriptions have full
         // access mode (no + or - in the dacs string). Changes to known subscriptions are sent as
         // deltas, but they should not happen here.
-        final AccessMode? acs = AccessMode(pres.dacs);
+        final acs = AccessMode(pres.dacs);
 
         if (acs.mode == INVALID) {
           _loggerService.error('Invalid access mode update ${pres.src ?? ''} ${pres.dacs}');
