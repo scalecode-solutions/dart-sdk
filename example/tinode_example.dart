@@ -15,7 +15,7 @@ library;
 
 import 'dart:io';
 
-import 'package:tindarts_sdk/tinode.dart';
+import 'package:tindarts_sdk/tindarts_sdk.dart';
 
 void main() async {
   // Connection options for sandbox.tinode.co
