@@ -1,5 +1,5 @@
-import 'package:tindarts_sdk/src/models/access-mode.dart';
-import 'package:tindarts_sdk/src/models/def-acs.dart';
+import 'package:tindarts_sdk/src/models/access_mode.dart';
+import 'package:tindarts_sdk/src/models/def_acs.dart';
 
 class TopicDescription {
   /// Topic creation date

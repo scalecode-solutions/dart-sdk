@@ -1,11 +1,11 @@
 import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 
-import 'package:tindarts_sdk/src/models/message-status.dart' as message_status;
-import 'package:tindarts_sdk/src/models/packet-types.dart' as packet_types;
-import 'package:tindarts_sdk/src/services/packet-generator.dart';
-import 'package:tindarts_sdk/src/models/server-messages.dart';
-import 'package:tindarts_sdk/src/models/packet-data.dart';
+import 'package:tindarts_sdk/src/models/message_status.dart' as message_status;
+import 'package:tindarts_sdk/src/models/packet_types.dart' as packet_types;
+import 'package:tindarts_sdk/src/services/packet_generator.dart';
+import 'package:tindarts_sdk/src/models/server_messages.dart';
+import 'package:tindarts_sdk/src/models/packet_data.dart';
 import 'package:tindarts_sdk/src/models/packet.dart';
 
 class Message {
@@ -23,12 +23,12 @@ class Message {
   PublishSubject<int> onStatusChange = PublishSubject<int>();
 
   Message(this.topicName, this.content, this.echo) {
-    _status = message_status.NONE;
+    _status = message_status.statusNone;
     _packetGenerator = GetIt.I.get<PacketGenerator>();
   }
 
   Packet asPubPacket() {
-    final packet = _packetGenerator.generate(packet_types.Pub, topicName);
+    final packet = _packetGenerator.generate(packet_types.pub, topicName);
     final data = packet.data as PubPacketData;
     data.content = content;
     data.noecho = !echo;
@@ -60,6 +60,6 @@ class Message {
 
   void resetLocalValues() {
     ts = null;
-    setStatus(message_status.NONE);
+    setStatus(message_status.statusNone);
   }
 }

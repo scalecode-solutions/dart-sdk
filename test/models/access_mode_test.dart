@@ -1,4 +1,4 @@
-import 'package:tindarts_sdk/src/models/access-mode.dart';
+import 'package:tindarts_sdk/src/models/access_mode.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -39,9 +39,9 @@ void main() {
 
   test('checkFlag() returns true if AccessNode has flag', () {
     final a = AccessMode({'mode': 'RWP', 'given': 'RWP', 'want': 'RWP'});
-    expect(AccessMode.checkFlag(a, 'mode', READ), equals(true));
-    expect(AccessMode.checkFlag(a, 'given', SHARE), equals(false));
-    expect(AccessMode.checkFlag(a, 'want', WRITE), equals(true));
+    expect(AccessMode.checkFlag(a, 'mode', modeRead), equals(true));
+    expect(AccessMode.checkFlag(a, 'given', modeShare), equals(false));
+    expect(AccessMode.checkFlag(a, 'want', modeWrite), equals(true));
   });
 
   test('getMode() reads mode in instance', () {
@@ -114,48 +114,48 @@ void main() {
     expect(a.getGiven(), equals('RWS'));
   });
 
-  test('isOwner() returns true if has OWNER flag', () {
+  test('isOwner() returns true if has owner flag', () {
     final a = AccessMode({'mode': 'ORW', 'given': 'RWS', 'want': 'RW'});
     expect(a.isOwner('mode'), equals(true));
     expect(a.isOwner('given'), equals(false));
   });
 
-  test('isPresencer() returns true if has PRES flag', () {
+  test('isPresencer() returns true if has pres flag', () {
     final a = AccessMode({'mode': 'PRW', 'given': 'RWS', 'want': 'RW'});
     expect(a.isPresencer('mode'), equals(true));
   });
 
-  test('isMuted() returns true if has no PRES flag', () {
+  test('isMuted() returns true if has no pres flag', () {
     final a = AccessMode({'mode': 'RW', 'given': 'RWS', 'want': 'RW'});
     expect(a.isMuted('mode'), equals(true));
   });
 
-  test('isJoiner() returns true if has no JOIN flag', () {
+  test('isJoiner() returns true if has no join flag', () {
     final a = AccessMode({'mode': 'JRW', 'given': 'RWS', 'want': 'RW'});
     expect(a.isJoiner('mode'), equals(true));
   });
 
-  test('isReader() returns true if has READ flag', () {
+  test('isReader() returns true if has modeRead flag', () {
     final a = AccessMode({'mode': 'JRW', 'given': 'RWS', 'want': 'RW'});
     expect(a.isReader('mode'), equals(true));
   });
 
-  test('isWriter() returns true if has WRITE flag', () {
+  test('isWriter() returns true if has modeWrite flag', () {
     final a = AccessMode({'mode': 'JRW', 'given': 'RWS', 'want': 'RW'});
     expect(a.isWriter('mode'), equals(true));
   });
 
-  test('isAdmin() returns true if has OWNER and APPROVE flag', () {
+  test('isAdmin() returns true if has owner and approve flag', () {
     final a = AccessMode({'mode': 'OAR', 'given': 'RWS', 'want': 'RW'});
     expect(a.isAdmin('mode'), equals(true));
   });
 
-  test('isSharer() returns true if has SHARE flag', () {
+  test('isSharer() returns true if has modeShare flag', () {
     final a = AccessMode({'mode': 'OAS', 'given': 'RWS', 'want': 'RW'});
     expect(a.isSharer('mode'), equals(true));
   });
 
-  test('isDeleter() returns true if has DELETE flag', () {
+  test('isDeleter() returns true if has delete flag', () {
     final a = AccessMode({'mode': 'OAD', 'given': 'RWS', 'want': 'RW'});
     expect(a.isDeleter('mode'), equals(true));
   });

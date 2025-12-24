@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
-import 'package:tindarts_sdk/src/models/auth-token.dart';
-import 'package:tindarts_sdk/src/models/server-messages.dart';
+import 'package:tindarts_sdk/src/models/auth_token.dart';
+import 'package:tindarts_sdk/src/models/server_messages.dart';
 import 'package:tindarts_sdk/src/services/auth.dart';
 
 void main() {

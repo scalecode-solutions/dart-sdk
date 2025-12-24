@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:tindarts_sdk/src/models/topic-names.dart' as topic_names;
-import 'package:tindarts_sdk/src/models/connection-options.dart';
-import 'package:tindarts_sdk/src/models/access-mode.dart';
+import 'package:tindarts_sdk/src/models/topic_names.dart' as topic_names;
+import 'package:tindarts_sdk/src/models/connection_options.dart';
+import 'package:tindarts_sdk/src/models/access_mode.dart';
 import 'package:tindarts_sdk/src/models/values.dart';
 
 /// Initialize a random message Id
@@ -66,13 +66,13 @@ class Tools {
   /// Figure out if the topic name belongs to a new group
   static bool isNewGroupTopicName(String topicName) {
     final prefix = topicName.substring(0, 3);
-    return prefix == topic_names.TOPIC_NEW || prefix == topic_names.TOPIC_NEW_CHAN;
+    return prefix == topic_names.topicNew || prefix == topic_names.topicNewChan;
   }
 
   /// Figure out if the topic name belongs to a new channel
   static bool isChannelTopicName(String topicName) {
     final prefix = topicName.substring(0, 3);
-    return prefix == topic_names.TOPIC_CHAN || prefix == topic_names.TOPIC_NEW_CHAN;
+    return prefix == topic_names.topicChan || prefix == topic_names.topicNewChan;
   }
 
   /// Create authorized URL
@@ -101,7 +101,7 @@ class Tools {
       if (out.isEmpty) {
       // Add single tag with a Unicode Del character, otherwise an empty array
       // is ambiguous. The Del tag will be stripped by the server.
-      out.add(DEL_CHAR);
+      out.add(delChar);
     }
     return out;
   }

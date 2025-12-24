@@ -1,1 +1,1 @@
-const DEL_CHAR = '\u2421';
+const delChar = '\u2421';

@@ -1,5 +1,5 @@
 import 'package:tindarts_sdk/src/models/credential.dart';
-import 'package:tindarts_sdk/src/models/def-acs.dart';
+import 'package:tindarts_sdk/src/models/def_acs.dart';
 
 /// Defined parameters for an account
 class AccountParams {

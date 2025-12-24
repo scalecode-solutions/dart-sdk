@@ -1,4 +1,4 @@
-import 'package:tindarts_sdk/src/models/packet-data.dart';
+import 'package:tindarts_sdk/src/models/packet_data.dart';
 
 class Packet {
   String? id;
@@ -10,11 +10,7 @@ class Packet {
   bool? cancelled;
   bool? noForwarding;
 
-  Packet(String name, PacketData data, String id) {
-    this.name = name;
-    this.data = data;
-    this.id = id;
-
+  Packet(this.name, this.data, this.id) {
     failed = false;
     sending = false;
   }

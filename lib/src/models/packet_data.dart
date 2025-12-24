@@ -1,5 +1,5 @@
-import 'package:tindarts_sdk/src/models/set-params.dart';
-import 'package:tindarts_sdk/src/models/get-query.dart';
+import 'package:tindarts_sdk/src/models/set_params.dart';
+import 'package:tindarts_sdk/src/models/get_query.dart';
 
 abstract class PacketData {
   Map<String, dynamic> toMap();

@@ -1,5 +1,5 @@
-import 'package:tindarts_sdk/src/models/topic-description.dart';
-import 'package:tindarts_sdk/src/models/access-mode.dart';
+import 'package:tindarts_sdk/src/models/topic_description.dart';
+import 'package:tindarts_sdk/src/models/access_mode.dart';
 
 /// Info on when the peer was last online
 class Seen {

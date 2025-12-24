@@ -1,7 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'dart:async';
 
-import 'package:tindarts_sdk/src/models/future-callback.dart';
+import 'package:tindarts_sdk/src/models/future_callback.dart';
 import 'package:tindarts_sdk/src/services/configuration.dart';
 import 'package:tindarts_sdk/src/services/logger.dart';
 

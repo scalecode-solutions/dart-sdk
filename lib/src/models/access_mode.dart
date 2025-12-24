@@ -1,35 +1,35 @@
 /// This numeric value represents `N` or `n` access mode flag.
-const int NONE = 0x00;
+const int modeNone = 0x00;
 
 /// This numeric value represents `J` access mode flag.
-const int JOIN = 0x01;
+const int modeJoin = 0x01;
 
 /// This numeric value represents `R` access mode flag.
-const int READ = 0x02;
+const int modeRead = 0x02;
 
 /// This numeric value represents `W` access mode flag.
-const int WRITE = 0x04;
+const int modeWrite = 0x04;
 
 /// This numeric value represents `P` access mode flag.
-const int PRES = 0x08;
+const int modePres = 0x08;
 
 /// This numeric value represents `A` access mode flag.
-const int APPROVE = 0x10;
+const int modeApprove = 0x10;
 
 /// This numeric value represents `S` access mode flag.
-const int SHARE = 0x20;
+const int modeShare = 0x20;
 
 /// This numeric value represents `D` access mode flag.
-const int DELETE = 0x40;
+const int modeDelete = 0x40;
 
 /// This numeric value represents `O` access mode flag.
-const int OWNER = 0x80;
+const int modeOwner = 0x80;
 
 /// This numeric value represents `invalid` access mode flag.
-const int INVALID = 0x100000;
+const int modeInvalid = 0x100000;
 
 /// Bitmask for validating access modes
-const int AccessModePermissionsBITMASK = JOIN | READ | WRITE | PRES | APPROVE | SHARE | DELETE | OWNER;
+const int accessModePermissionsBitmask = modeJoin | modeRead | modeWrite | modePres | modeApprove | modeShare | modeDelete | modeOwner;
 
 /// Access control is mostly usable for group topics. Its usability for me and P2P topics is
 /// limited to managing presence notifications and banning uses from initiating or continuing P2P conversations.
@@ -79,23 +79,23 @@ class AccessMode {
     if (mode == null) {
       return null;
     } else if (mode is int) {
-      return mode & AccessModePermissionsBITMASK;
+      return mode & accessModePermissionsBitmask;
     } else if (mode == 'N' || mode == 'n') {
-      return NONE;
+      return modeNone;
     }
 
     final bitmask = <String, int>{
-      'J': JOIN,
-      'R': READ,
-      'W': WRITE,
-      'P': PRES,
-      'A': APPROVE,
-      'S': SHARE,
-      'D': DELETE,
-      'O': OWNER,
+      'J': modeJoin,
+      'R': modeRead,
+      'W': modeWrite,
+      'P': modePres,
+      'A': modeApprove,
+      'S': modeShare,
+      'D': modeDelete,
+      'O': modeOwner,
     };
 
-    var m0 = NONE;
+    var m0 = modeNone;
 
     if (mode != null) {
       final int length = mode.length as int;
@@ -114,9 +114,9 @@ class AccessMode {
 
   /// Decodes integer access mode to string
   static String? encode(int val) {
-    if (val == INVALID) {
+    if (val == modeInvalid) {
       return null;
-    } else if (val == NONE) {
+    } else if (val == modeNone) {
       return 'N';
     }
 
@@ -153,7 +153,7 @@ class AccessMode {
       for (var i = 0; i < parts.length; i++) {
         final action = actions[i];
         final m0 = AccessMode.decode(parts[i]);
-        if (m0 == INVALID) {
+        if (m0 == modeInvalid) {
           return val;
         }
         if (m0 == null) {
@@ -169,7 +169,7 @@ class AccessMode {
     } else {
       // The string is an explicit new value 'ABC' rather than delta.
       final val0 = AccessMode.decode(upd);
-      if (val0 != INVALID) {
+      if (val0 != modeInvalid) {
         val = val0 ?? 0;
       }
     }
@@ -182,8 +182,8 @@ class AccessMode {
     final a1d = AccessMode.decode(a1) ?? 0;
     final a2d = AccessMode.decode(a2) ?? 0;
 
-    if (a1d == INVALID || a2d == INVALID) {
-      return INVALID;
+    if (a1d == modeInvalid || a2d == modeInvalid) {
+      return modeInvalid;
     }
     return a1d & ~a2d;
   }
@@ -275,11 +275,11 @@ class AccessMode {
   }
 
   bool isOwner(String side) {
-    return AccessMode.checkFlag(this, side, OWNER);
+    return AccessMode.checkFlag(this, side, modeOwner);
   }
 
   bool isPresencer(String? side) {
-    return AccessMode.checkFlag(this, side, PRES);
+    return AccessMode.checkFlag(this, side, modePres);
   }
 
   bool isMuted(String? side) {
@@ -288,19 +288,19 @@ class AccessMode {
 
   /// Can this user subscribe on topic?
   bool isJoiner(String side) {
-    return AccessMode.checkFlag(this, side, JOIN);
+    return AccessMode.checkFlag(this, side, modeJoin);
   }
 
   bool isReader(String side) {
-    return AccessMode.checkFlag(this, side, READ);
+    return AccessMode.checkFlag(this, side, modeRead);
   }
 
   bool isWriter(String side) {
-    return AccessMode.checkFlag(this, side, WRITE);
+    return AccessMode.checkFlag(this, side, modeWrite);
   }
 
   bool isApprover(String side) {
-    return AccessMode.checkFlag(this, side, APPROVE);
+    return AccessMode.checkFlag(this, side, modeApprove);
   }
 
   bool isAdmin(String side) {
@@ -308,11 +308,11 @@ class AccessMode {
   }
 
   bool isSharer(String side) {
-    return isAdmin(side) || AccessMode.checkFlag(this, side, SHARE);
+    return isAdmin(side) || AccessMode.checkFlag(this, side, modeShare);
   }
 
   bool isDeleter(String side) {
-    return AccessMode.checkFlag(this, side, DELETE);
+    return AccessMode.checkFlag(this, side, modeDelete);
   }
 
   @override

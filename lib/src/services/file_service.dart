@@ -7,7 +7,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:get_it/get_it.dart';
 
-import 'package:tindarts_sdk/src/models/connection-options.dart';
+import 'package:tindarts_sdk/src/models/connection_options.dart';
 import 'package:tindarts_sdk/src/services/auth.dart';
 import 'package:tindarts_sdk/src/services/configuration.dart';
 import 'package:tindarts_sdk/src/services/logger.dart';

@@ -2,13 +2,13 @@ import 'package:get_it/get_it.dart';
 import 'package:rxdart/rxdart.dart';
 import 'dart:math';
 
-import 'package:tindarts_sdk/src/models/topic-names.dart' as topic_names;
-import 'package:tindarts_sdk/src/models/topic-subscription.dart';
-import 'package:tindarts_sdk/src/models/topic-description.dart';
-import 'package:tindarts_sdk/src/models/server-messages.dart';
-import 'package:tindarts_sdk/src/services/cache-manager.dart';
-import 'package:tindarts_sdk/src/models/contact-update.dart';
-import 'package:tindarts_sdk/src/models/access-mode.dart';
+import 'package:tindarts_sdk/src/models/topic_names.dart' as topic_names;
+import 'package:tindarts_sdk/src/models/topic_subscription.dart';
+import 'package:tindarts_sdk/src/models/topic_description.dart';
+import 'package:tindarts_sdk/src/models/server_messages.dart';
+import 'package:tindarts_sdk/src/services/cache_manager.dart';
+import 'package:tindarts_sdk/src/models/contact_update.dart';
+import 'package:tindarts_sdk/src/models/access_mode.dart';
 import 'package:tindarts_sdk/src/models/credential.dart';
 import 'package:tindarts_sdk/src/services/logger.dart';
 import 'package:tindarts_sdk/src/services/tinode.dart';
@@ -40,7 +40,7 @@ class TopicMe extends Topic {
   /// Logger service, responsible for logging content in different levels
   late LoggerService _loggerService;
 
-  TopicMe() : super(topic_names.TOPIC_ME) {
+  TopicMe() : super(topic_names.topicMe) {
     _cacheManager = GetIt.I.get<CacheManager>();
     _tinodeService = GetIt.I.get<TinodeService>();
     _loggerService = GetIt.I.get<LoggerService>();
@@ -89,7 +89,7 @@ class TopicMe extends Topic {
     for (var sub in subscriptions) {
       final topicName = sub.topic;
       // Don't show 'me' and 'fnd' topics in the list of contacts.
-      if (topicName == topic_names.TOPIC_FND || topicName == topic_names.TOPIC_ME) {
+      if (topicName == topic_names.topicFnd || topicName == topic_names.topicMe) {
         continue;
       }
 
@@ -157,7 +157,7 @@ class TopicMe extends Topic {
   @override
   void processMetaCreds(List<Credential> creds, bool update) {
     // ignore: unrelated_type_equality_checks
-    if (creds.length == 1 && creds[0] == DEL_CHAR) {
+    if (creds.length == 1 && creds[0] == delChar) {
       creds = [];
     }
 
@@ -213,7 +213,7 @@ class TopicMe extends Topic {
       return;
     }
 
-    if (pres.what == 'upd' && pres.src == topic_names.TOPIC_ME) {
+    if (pres.what == 'upd' && pres.src == topic_names.topicMe) {
       // Update to me description. Request updated value.
       getMeta(startMetaQuery().withDesc(null).build());
       return;
@@ -296,10 +296,10 @@ class TopicMe extends Topic {
         // deltas, but they should not happen here.
         final acs = AccessMode(pres.dacs);
 
-        if (acs.mode == INVALID) {
+        if (acs.mode == modeInvalid) {
           _loggerService.error('Invalid access mode update ${pres.src ?? ''} ${pres.dacs}');
           return;
-        } else if (acs.mode == NONE) {
+        } else if (acs.mode == modeNone) {
           _loggerService.warn('Removing non-existent subscription ${pres.src ?? ''} ${pres.dacs}');
         } else {
           // New subscription. Send request for the full description.
@@ -317,7 +317,7 @@ class TopicMe extends Topic {
   }
 
   @override
-  Future<CtrlMessage> publishMessage(Message a) {
+  Future<CtrlMessage> publishMessage(Message message) {
     return Future.error(Exception("Publishing to 'me' is not supported"));
   }
 

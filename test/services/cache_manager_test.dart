@@ -1,11 +1,11 @@
 import 'package:get_it/get_it.dart';
 import 'package:test/test.dart';
 
-import 'package:tindarts_sdk/src/models/connection-options.dart';
-import 'package:tindarts_sdk/src/models/topic-subscription.dart';
-import 'package:tindarts_sdk/src/services/packet-generator.dart';
-import 'package:tindarts_sdk/src/services/future-manager.dart';
-import 'package:tindarts_sdk/src/services/cache-manager.dart';
+import 'package:tindarts_sdk/src/models/connection_options.dart';
+import 'package:tindarts_sdk/src/models/topic_subscription.dart';
+import 'package:tindarts_sdk/src/services/packet_generator.dart';
+import 'package:tindarts_sdk/src/services/future_manager.dart';
+import 'package:tindarts_sdk/src/services/cache_manager.dart';
 import 'package:tindarts_sdk/src/services/configuration.dart';
 import 'package:tindarts_sdk/src/services/connection.dart';
 import 'package:tindarts_sdk/src/services/logger.dart';

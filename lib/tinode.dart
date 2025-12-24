@@ -7,56 +7,56 @@ import 'dart:typed_data';
 import 'package:rxdart/rxdart.dart';
 import 'package:get_it/get_it.dart';
 
-import 'package:tindarts_sdk/src/models/topic-names.dart' as topic_names;
-import 'package:tindarts_sdk/src/models/server-configuration.dart';
-import 'package:tindarts_sdk/src/models/connection-options.dart';
-import 'package:tindarts_sdk/src/services/packet-generator.dart';
-import 'package:tindarts_sdk/src/services/future-manager.dart';
-import 'package:tindarts_sdk/src/models/server-messages.dart';
-import 'package:tindarts_sdk/src/services/cache-manager.dart';
+import 'package:tindarts_sdk/src/models/topic_names.dart' as topic_names;
+import 'package:tindarts_sdk/src/models/server_configuration.dart';
+import 'package:tindarts_sdk/src/models/connection_options.dart';
+import 'package:tindarts_sdk/src/services/packet_generator.dart';
+import 'package:tindarts_sdk/src/services/future_manager.dart';
+import 'package:tindarts_sdk/src/models/server_messages.dart';
+import 'package:tindarts_sdk/src/services/cache_manager.dart';
 import 'package:tindarts_sdk/src/services/configuration.dart';
-import 'package:tindarts_sdk/src/models/account-params.dart';
+import 'package:tindarts_sdk/src/models/account_params.dart';
 import 'package:tindarts_sdk/src/services/connection.dart';
-import 'package:tindarts_sdk/src/models/access-mode.dart';
-import 'package:tindarts_sdk/src/models/set-params.dart';
-import 'package:tindarts_sdk/src/models/auth-token.dart';
-import 'package:tindarts_sdk/src/models/del-range.dart';
-import 'package:tindarts_sdk/src/models/get-query.dart';
+import 'package:tindarts_sdk/src/models/access_mode.dart';
+import 'package:tindarts_sdk/src/models/set_params.dart';
+import 'package:tindarts_sdk/src/models/auth_token.dart';
+import 'package:tindarts_sdk/src/models/del_range.dart';
+import 'package:tindarts_sdk/src/models/get_query.dart';
 import 'package:tindarts_sdk/src/services/logger.dart';
 import 'package:tindarts_sdk/src/services/tinode.dart';
 import 'package:tindarts_sdk/src/models/message.dart';
 import 'package:tindarts_sdk/src/services/tools.dart';
 import 'package:tindarts_sdk/src/services/auth.dart';
 import 'package:tindarts_sdk/src/services/file_service.dart';
-import 'package:tindarts_sdk/src/topic-fnd.dart';
-import 'package:tindarts_sdk/src/topic-me.dart';
+import 'package:tindarts_sdk/src/topic_fnd.dart';
+import 'package:tindarts_sdk/src/topic_me.dart';
 import 'package:tindarts_sdk/src/topic.dart';
 
-export 'package:tindarts_sdk/src/models/server-configuration.dart';
-export 'package:tindarts_sdk/src/models/connection-options.dart';
-export 'package:tindarts_sdk/src/models/delete-transaction.dart';
-export 'package:tindarts_sdk/src/models/topic-subscription.dart';
-export 'package:tindarts_sdk/src/models/topic-description.dart';
-export 'package:tindarts_sdk/src/models/server-messages.dart';
-export 'package:tindarts_sdk/src/models/account-params.dart';
-export 'package:tindarts_sdk/src/models/message-status.dart';
-export 'package:tindarts_sdk/src/models/contact-update.dart';
-export 'package:tindarts_sdk/src/models/app-settings.dart';
-export 'package:tindarts_sdk/src/models/packet-types.dart';
-export 'package:tindarts_sdk/src/models/packet-data.dart';
-export 'package:tindarts_sdk/src/models/auth-token.dart';
+export 'package:tindarts_sdk/src/models/server_configuration.dart';
+export 'package:tindarts_sdk/src/models/connection_options.dart';
+export 'package:tindarts_sdk/src/models/delete_transaction.dart';
+export 'package:tindarts_sdk/src/models/topic_subscription.dart';
+export 'package:tindarts_sdk/src/models/topic_description.dart';
+export 'package:tindarts_sdk/src/models/server_messages.dart';
+export 'package:tindarts_sdk/src/models/account_params.dart';
+export 'package:tindarts_sdk/src/models/message_status.dart';
+export 'package:tindarts_sdk/src/models/contact_update.dart';
+export 'package:tindarts_sdk/src/models/app_settings.dart';
+export 'package:tindarts_sdk/src/models/packet_types.dart';
+export 'package:tindarts_sdk/src/models/packet_data.dart';
+export 'package:tindarts_sdk/src/models/auth_token.dart';
 export 'package:tindarts_sdk/src/models/credential.dart';
-export 'package:tindarts_sdk/src/models/set-params.dart';
-export 'package:tindarts_sdk/src/meta-get-builder.dart';
-export 'package:tindarts_sdk/src/models/del-range.dart';
-export 'package:tindarts_sdk/src/models/get-query.dart';
+export 'package:tindarts_sdk/src/models/set_params.dart';
+export 'package:tindarts_sdk/src/meta_get_builder.dart';
+export 'package:tindarts_sdk/src/models/del_range.dart';
+export 'package:tindarts_sdk/src/models/get_query.dart';
 export 'package:tindarts_sdk/src/services/tools.dart';
 export 'package:tindarts_sdk/src/services/file_service.dart';
 export 'package:tindarts_sdk/src/services/connection.dart' show ConnectionState;
-export 'package:tindarts_sdk/src/models/def-acs.dart';
-export 'package:tindarts_sdk/src/sorted-cache.dart';
-export 'package:tindarts_sdk/src/topic-fnd.dart';
-export 'package:tindarts_sdk/src/topic-me.dart';
+export 'package:tindarts_sdk/src/models/def_acs.dart';
+export 'package:tindarts_sdk/src/sorted_cache.dart';
+export 'package:tindarts_sdk/src/topic_fnd.dart';
+export 'package:tindarts_sdk/src/topic_me.dart';
 export 'package:tindarts_sdk/src/topic.dart';
 
 /// Provides a simple interface to interact with tinode server using websocket
@@ -302,7 +302,7 @@ class Tinode {
 
   /// Create a new user. Wrapper for `account` method
   Future<dynamic> createAccount(String scheme, String secret, bool login, AccountParams? params) {
-    var promise = account(topic_names.USER_NEW, scheme, secret, login, params);
+    var promise = account(topic_names.userNew, scheme, secret, login, params);
     if (login) {
       promise = promise.then((dynamic ctrl) {
         _authService.onLoginSuccessful(ctrl as CtrlMessage);
@@ -503,12 +503,12 @@ class Tinode {
 
   /// Instantiate 'me' topic or get it from cache
   TopicMe getMeTopic() {
-    return _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe;
+    return _tinodeService.getTopic(topic_names.topicMe) as TopicMe;
   }
 
   /// Instantiate 'fnd' (find) topic or get it from cache
   TopicFnd getFndTopic() {
-    return _tinodeService.getTopic(topic_names.TOPIC_FND) as TopicFnd;
+    return _tinodeService.getTopic(topic_names.topicFnd) as TopicFnd;
   }
 
   /// Get the user id of the the current authenticated user

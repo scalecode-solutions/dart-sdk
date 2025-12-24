@@ -1,5 +1,5 @@
-import 'package:tindarts_sdk/src/models/topic-subscription.dart';
-import 'package:tindarts_sdk/src/models/access-mode.dart';
+import 'package:tindarts_sdk/src/models/topic_subscription.dart';
+import 'package:tindarts_sdk/src/models/access_mode.dart';
 import 'package:tindarts_sdk/src/topic.dart';
 
 /// This is a data structure for user's data in cache

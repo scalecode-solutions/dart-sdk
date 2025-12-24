@@ -1,0 +1,10 @@
+const String hi = 'hi';
+const String acc = 'acc';
+const String login = 'login';
+const String sub = 'sub';
+const String leave = 'leave';
+const String pub = 'pub';
+const String get = 'get';
+const String set = 'set';
+const String del = 'del';
+const String note = 'note';

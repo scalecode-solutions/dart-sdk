@@ -1,7 +1,7 @@
-import 'package:tindarts_sdk/src/models/topic-subscription.dart';
-import 'package:tindarts_sdk/src/models/delete-transaction.dart';
-import 'package:tindarts_sdk/src/models/topic-description.dart';
-import 'package:tindarts_sdk/src/models/access-mode.dart';
+import 'package:tindarts_sdk/src/models/topic_subscription.dart';
+import 'package:tindarts_sdk/src/models/delete_transaction.dart';
+import 'package:tindarts_sdk/src/models/topic_description.dart';
+import 'package:tindarts_sdk/src/models/access_mode.dart';
 import 'package:tindarts_sdk/src/models/credential.dart';
 
 class ServerMessage {

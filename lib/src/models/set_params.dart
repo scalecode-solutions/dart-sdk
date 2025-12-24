@@ -1,5 +1,5 @@
-import 'package:tindarts_sdk/src/models/topic-description.dart';
-import 'package:tindarts_sdk/src/models/topic-subscription.dart';
+import 'package:tindarts_sdk/src/models/topic_description.dart';
+import 'package:tindarts_sdk/src/models/topic_subscription.dart';
 import 'package:tindarts_sdk/src/models/credential.dart';
 
 class SetParams {

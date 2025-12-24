@@ -4,29 +4,29 @@ import 'package:get_it/get_it.dart';
 import 'dart:async';
 import 'dart:math';
 
-import 'package:tindarts_sdk/src/models/message-status.dart' as message_status;
-import 'package:tindarts_sdk/src/models/topic-names.dart' as topic_names;
-import 'package:tindarts_sdk/src/models/delete-transaction.dart';
-import 'package:tindarts_sdk/src/models/topic-subscription.dart';
-import 'package:tindarts_sdk/src/models/topic-description.dart';
-import 'package:tindarts_sdk/src/services/cache-manager.dart';
-import 'package:tindarts_sdk/src/models/server-messages.dart';
+import 'package:tindarts_sdk/src/models/message_status.dart' as message_status;
+import 'package:tindarts_sdk/src/models/topic_names.dart' as topic_names;
+import 'package:tindarts_sdk/src/models/delete_transaction.dart';
+import 'package:tindarts_sdk/src/models/topic_subscription.dart';
+import 'package:tindarts_sdk/src/models/topic_description.dart';
+import 'package:tindarts_sdk/src/services/cache_manager.dart';
+import 'package:tindarts_sdk/src/models/server_messages.dart';
 import 'package:tindarts_sdk/src/services/configuration.dart';
-import 'package:tindarts_sdk/src/models/access-mode.dart';
+import 'package:tindarts_sdk/src/models/access_mode.dart';
 import 'package:tindarts_sdk/src/models/credential.dart';
-import 'package:tindarts_sdk/src/models/set-params.dart';
-import 'package:tindarts_sdk/src/meta-get-builder.dart';
-import 'package:tindarts_sdk/src/models/del-range.dart';
-import 'package:tindarts_sdk/src/models/get-query.dart';
+import 'package:tindarts_sdk/src/models/set_params.dart';
+import 'package:tindarts_sdk/src/meta_get_builder.dart';
+import 'package:tindarts_sdk/src/models/del_range.dart';
+import 'package:tindarts_sdk/src/models/get_query.dart';
 import 'package:tindarts_sdk/src/services/logger.dart';
 import 'package:tindarts_sdk/src/services/tinode.dart';
 import 'package:tindarts_sdk/src/models/message.dart';
-import 'package:tindarts_sdk/src/models/def-acs.dart';
+import 'package:tindarts_sdk/src/models/def_acs.dart';
 import 'package:tindarts_sdk/src/services/tools.dart';
 import 'package:tindarts_sdk/src/models/values.dart';
 import 'package:tindarts_sdk/src/services/auth.dart';
-import 'package:tindarts_sdk/src/sorted-cache.dart';
-import 'package:tindarts_sdk/src/topic-me.dart';
+import 'package:tindarts_sdk/src/sorted_cache.dart';
+import 'package:tindarts_sdk/src/topic_me.dart';
 
 class Topic {
   /// This topic's name
@@ -74,7 +74,7 @@ class Topic {
   final SortedCache<DataMessage> _messages = SortedCache<DataMessage>((a, b) => (a.seq ?? 0) - (b.seq ?? 0), true);
 
   /// true if the topic is currently live
-  bool _subscribed = false;
+  bool isSubscribed = false;
 
   /// Timestamp when topic meta-desc update was received
   late DateTime _lastDescUpdate;
@@ -158,16 +158,6 @@ class Topic {
     _configService = GetIt.I.get<ConfigService>();
   }
 
-  // See if you have subscribed to this topic
-  bool get isSubscribed {
-    return _subscribed;
-  }
-
-  // To set _subscribed manually, Used in unit tests
-  set isSubscribed(bool value) {
-    _subscribed = value;
-  }
-
   Future<CtrlMessage> subscribe(GetQuery getParams, SetParams? setParams) async {
     // If the topic is already subscribed, return resolved promise
     if (isSubscribed) {
@@ -176,7 +166,7 @@ class Topic {
 
     // Send subscribe message, handle async response.
     // If topic name is explicitly provided, use it. If no name, then it's a new group topic, use "new".
-    final response = await _tinodeService.subscribe(name ?? topic_names.TOPIC_NEW, getParams, setParams);
+    final response = await _tinodeService.subscribe(name ?? topic_names.topicNew, getParams, setParams);
     final ctrl = response is CtrlMessage ? response : null;
     final meta = response is MetaMessage ? response : null;
 
@@ -193,7 +183,7 @@ class Topic {
       return ctrl;
     }
 
-    _subscribed = true;
+    isSubscribed = true;
     acs = (ctrl.params != null && ctrl.params['acs'] != null) ? AccessMode(ctrl.params['acs']) : acs;
 
     // Set topic name for new topics and add it to cache.
@@ -206,9 +196,9 @@ class Topic {
       updated = ctrl.ts!;
       // Don't assign touched, otherwise topic will be put on top of the list on subscribe.
 
-      if (name != topic_names.TOPIC_ME && name != topic_names.TOPIC_FND) {
+      if (name != topic_names.topicMe && name != topic_names.topicFnd) {
         // Add the new topic to the list of contacts maintained by the 'me' topic.
-        final me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe?;
+        final me = _tinodeService.getTopic(topic_names.topicMe) as TopicMe?;
         if (me != null) {
           me.processMetaSub([
             TopicSubscription(
@@ -241,7 +231,7 @@ class Topic {
       return Future.error(Exception('Cannot publish on inactive topic'));
     }
 
-    message.setStatus(message_status.SENDING);
+    message.setStatus(message_status.statusSending);
 
     try {
       final response = await _tinodeService.publishMessage(message);
@@ -255,7 +245,7 @@ class Topic {
         message.ts = ctrl.ts;
         final seq = ctrl.params['seq'] as int?;
         if (seq != null) {
-          message.setStatus(message_status.SENT);
+          message.setStatus(message_status.statusSent);
           routeData(message.asDataMessage(_authService.userId ?? '', seq));
         }
       }
@@ -263,7 +253,7 @@ class Topic {
     } catch (e) {
       _loggerService.warn('Message rejected by the server');
       _loggerService.warn(e.toString());
-      message.setStatus(message_status.FAILED);
+      message.setStatus(message_status.statusFailed);
       onData.add(null);
       return Future.value(CtrlMessage());
     }
@@ -386,7 +376,7 @@ class Topic {
     if (private != null && private is Map && private['arch'] == archive) {
       return Future.error(Exception('Cannot publish on inactive topic'));
     }
-    return setMeta(SetParams(desc: TopicDescription(private: {'archive': archive ? true : DEL_CHAR})));
+    return setMeta(SetParams(desc: TopicDescription(private: {'archive': archive ? true : delChar})));
   }
 
   /// Delete messages. Hard-deleting messages requires Owner permission
@@ -515,7 +505,7 @@ class Topic {
       return;
     }
 
-    final me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe?;
+    final me = _tinodeService.getTopic(topic_names.topicMe) as TopicMe?;
     final user = _users[_authService.userId];
 
     var update = false;
@@ -737,7 +727,7 @@ class Topic {
     onData.add(data);
 
     // Update locally cached contact with the new message count.
-    final me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe;
+    final me = _tinodeService.getTopic(topic_names.topicMe) as TopicMe;
     me.setMsgReadRecv(name ?? '', (data.from == null || _tinodeService.isMe(data.from!)) ? 'read' : 'msg', data.seq!, data.ts);
   }
 
@@ -802,7 +792,7 @@ class Topic {
         if (user == null) {
           // Update for an unknown user: notification of a new subscription.
           final acs = AccessMode(null).updateAll(pres.dacs);
-          if (acs.mode != NONE) {
+          if (acs.mode != modeNone) {
             user = _cacheManager.getUser(userId ?? '');
 
             // ignore: unnecessary_null_comparison
@@ -849,7 +839,7 @@ class Topic {
 
       // If this is an update from the current user, update the contact with the new count too.
       if (_tinodeService.isMe(info.from ?? '')) {
-        final me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe;
+        final me = _tinodeService.getTopic(topic_names.topicMe) as TopicMe;
         me.setMsgReadRecv(info.topic!, info.what!, info.seq!, null);
       }
     }
@@ -878,8 +868,8 @@ class Topic {
     updated = desc.updated ?? updated;
     touched = desc.touched ?? touched;
 
-    if (name == topic_names.TOPIC_ME && !desc.noForwarding!) {
-      final me = _tinodeService.getTopic(topic_names.TOPIC_ME);
+    if (name == topic_names.topicMe && !desc.noForwarding!) {
+      final me = _tinodeService.getTopic(topic_names.topicMe);
       if (me != null) {
         me.processMetaSub([
           TopicSubscription(
@@ -927,7 +917,7 @@ class Topic {
 
   /// Called by Tinode when meta.tags is received.
   void processMetaTags(List<String> tags) {
-    if (tags.isNotEmpty && tags[0] == DEL_CHAR) {
+    if (tags.isNotEmpty && tags[0] == delChar) {
       tags = [];
     }
 
@@ -973,7 +963,7 @@ class Topic {
 
   /// Reset subscribed state
   void resetSubscription() {
-    _subscribed = false;
+    isSubscribed = false;
   }
 
   /// This topic is either deleted or unsubscribed from
@@ -985,7 +975,7 @@ class Topic {
     public = null;
     _maxSeq = 0;
     _minSeq = 0;
-    _subscribed = false;
+    isSubscribed = false;
   }
 
   /// Update global user cache and local subscribers cache

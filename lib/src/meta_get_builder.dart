@@ -1,11 +1,11 @@
 import 'package:get_it/get_it.dart';
 
-import 'package:tindarts_sdk/src/models/topic-names.dart' as topic_names;
-import 'package:tindarts_sdk/src/models/topic-subscription.dart';
-import 'package:tindarts_sdk/src/models/get-query.dart';
+import 'package:tindarts_sdk/src/models/topic_names.dart' as topic_names;
+import 'package:tindarts_sdk/src/models/topic_subscription.dart';
+import 'package:tindarts_sdk/src/models/get_query.dart';
 import 'package:tindarts_sdk/src/services/logger.dart';
 import 'package:tindarts_sdk/src/services/tinode.dart';
-import 'package:tindarts_sdk/src/topic-me.dart';
+import 'package:tindarts_sdk/src/topic_me.dart';
 import 'package:tindarts_sdk/src/topic.dart';
 
 class MetaGetBuilder {
@@ -24,7 +24,7 @@ class MetaGetBuilder {
     _loggerService = GetIt.I.get<LoggerService>();
 
     topic = parent;
-    final me = _tinodeService.getTopic(topic_names.TOPIC_ME) as TopicMe?;
+    final me = _tinodeService.getTopic(topic_names.topicMe) as TopicMe?;
 
     if (me != null) {
       if (parent.name != null) {

@@ -1,7 +1,7 @@
 import 'dart:io' show Platform;
 
-import 'package:tindarts_sdk/src/models/server-configuration.dart';
-import 'package:tindarts_sdk/src/models/app-settings.dart';
+import 'package:tindarts_sdk/src/models/server_configuration.dart';
+import 'package:tindarts_sdk/src/models/app_settings.dart';
 
 class ConfigService {
   late ServerConfiguration _serverConfiguration;
@@ -12,12 +12,11 @@ class ConfigService {
   String appVersion = '';
   String appName = '';
 
-  ConfigService(bool loggerEnabled) {
+  ConfigService(this.loggerEnabled) {
     _appSettings = AppSettings(0xFFFFFFF, 503, 1000, 5000);
     deviceToken = null;
     appVersion = '1.0.0-alpha.2';
     humanLanguage = 'en-US';
-    this.loggerEnabled = loggerEnabled;
   }
 
   AppSettings get appSettings {

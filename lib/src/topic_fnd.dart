@@ -1,7 +1,7 @@
-import 'package:tindarts_sdk/src/models/topic-names.dart' as topic_names;
-import 'package:tindarts_sdk/src/models/topic-subscription.dart';
-import 'package:tindarts_sdk/src/models/server-messages.dart';
-import 'package:tindarts_sdk/src/models/set-params.dart';
+import 'package:tindarts_sdk/src/models/topic_names.dart' as topic_names;
+import 'package:tindarts_sdk/src/models/topic_subscription.dart';
+import 'package:tindarts_sdk/src/models/server_messages.dart';
+import 'package:tindarts_sdk/src/models/set_params.dart';
 import 'package:tindarts_sdk/src/models/message.dart';
 import 'package:tindarts_sdk/src/topic.dart';
 
@@ -10,7 +10,7 @@ class TopicFnd extends Topic {
   // List of users and topics uid or topic_name -> Contact object)
   Map<String, TopicSubscription> _contacts = {};
 
-  TopicFnd() : super(topic_names.TOPIC_FND);
+  TopicFnd() : super(topic_names.topicFnd);
 
   /// Override the original Topic.processMetaSub
   @override

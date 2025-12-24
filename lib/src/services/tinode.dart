@@ -3,27 +3,27 @@ import 'dart:convert';
 import 'package:rxdart/rxdart.dart';
 import 'package:get_it/get_it.dart';
 
-import 'package:tindarts_sdk/src/models/packet-types.dart' as packet_types;
-import 'package:tindarts_sdk/src/models/topic-names.dart' as topic_names;
-import 'package:tindarts_sdk/src/services/packet-generator.dart';
-import 'package:tindarts_sdk/src/models/topic-description.dart';
-import 'package:tindarts_sdk/src/services/future-manager.dart';
-import 'package:tindarts_sdk/src/models/server-messages.dart';
+import 'package:tindarts_sdk/src/models/packet_types.dart' as packet_types;
+import 'package:tindarts_sdk/src/models/topic_names.dart' as topic_names;
+import 'package:tindarts_sdk/src/services/packet_generator.dart';
+import 'package:tindarts_sdk/src/models/topic_description.dart';
+import 'package:tindarts_sdk/src/services/future_manager.dart';
+import 'package:tindarts_sdk/src/models/server_messages.dart';
 import 'package:tindarts_sdk/src/services/configuration.dart';
-import 'package:tindarts_sdk/src/services/cache-manager.dart';
-import 'package:tindarts_sdk/src/models/account-params.dart';
+import 'package:tindarts_sdk/src/services/cache_manager.dart';
+import 'package:tindarts_sdk/src/models/account_params.dart';
 import 'package:tindarts_sdk/src/services/connection.dart';
-import 'package:tindarts_sdk/src/models/packet-data.dart';
-import 'package:tindarts_sdk/src/models/set-params.dart';
-import 'package:tindarts_sdk/src/models/get-query.dart';
-import 'package:tindarts_sdk/src/models/del-range.dart';
+import 'package:tindarts_sdk/src/models/packet_data.dart';
+import 'package:tindarts_sdk/src/models/set_params.dart';
+import 'package:tindarts_sdk/src/models/get_query.dart';
+import 'package:tindarts_sdk/src/models/del_range.dart';
 import 'package:tindarts_sdk/src/services/logger.dart';
 import 'package:tindarts_sdk/src/models/message.dart';
 import 'package:tindarts_sdk/src/services/tools.dart';
 import 'package:tindarts_sdk/src/services/auth.dart';
 import 'package:tindarts_sdk/src/models/packet.dart';
-import 'package:tindarts_sdk/src/topic-fnd.dart';
-import 'package:tindarts_sdk/src/topic-me.dart';
+import 'package:tindarts_sdk/src/topic_fnd.dart';
+import 'package:tindarts_sdk/src/topic_me.dart';
 import 'package:tindarts_sdk/src/topic.dart';
 
 /// This class contains basic functionality and logic to generate and send tinode packages
@@ -204,13 +204,13 @@ class TinodeService {
     if (deviceToken != null) {
       _configService.deviceToken = deviceToken;
     }
-    final packet = _packetGenerator.generate(packet_types.Hi, null);
+    final packet = _packetGenerator.generate(packet_types.hi, null);
     return _send(packet);
   }
 
   /// Create or update an account
   Future<dynamic> account(String userId, String scheme, String secret, bool login, AccountParams? params) {
-    final packet = _packetGenerator.generate(packet_types.Acc, null);
+    final packet = _packetGenerator.generate(packet_types.acc, null);
     final data = packet.data as AccPacketData;
     data.user = userId;
     data.login = login;
@@ -233,7 +233,7 @@ class TinodeService {
 
   /// Authenticate current session
   Future<CtrlMessage> login(String scheme, String secret, Map<String, dynamic>? cred) async {
-    final packet = _packetGenerator.generate(packet_types.Login, null);
+    final packet = _packetGenerator.generate(packet_types.login, null);
     final data = packet.data as LoginPacketData;
     data.scheme = scheme;
     data.secret = secret;
@@ -248,11 +248,11 @@ class TinodeService {
 
   /// Send a topic subscription request
   Future<dynamic> subscribe(String? topicName, GetQuery getParams, SetParams? setParams) {
-    final packet = _packetGenerator.generate(packet_types.Sub, topicName);
+    final packet = _packetGenerator.generate(packet_types.sub, topicName);
     final data = packet.data as SubPacketData;
 
     if (topicName == '' || topicName == null) {
-      topicName = topic_names.TOPIC_NEW;
+      topicName = topic_names.topicNew;
     }
 
     data.get = getParams;
@@ -283,7 +283,7 @@ class TinodeService {
 
   /// Detach and optionally unsubscribe from the topic
   Future<dynamic> leave(String topicName, bool unsubscribe) {
-    final packet = _packetGenerator.generate(packet_types.Leave, topicName);
+    final packet = _packetGenerator.generate(packet_types.leave, topicName);
     final data = packet.data as LeavePacketData;
     data.unsub = unsubscribe;
     packet.data = data;
@@ -293,9 +293,9 @@ class TinodeService {
   Topic? getTopic(String? topicName) {
     Topic? topic = _cacheManager.get('topic', topicName ?? '') as Topic?;
     if (topic == null && topicName != null) {
-      if (topicName == topic_names.TOPIC_ME) {
+      if (topicName == topic_names.topicMe) {
         topic = TopicMe();
-      } else if (topicName == topic_names.TOPIC_FND) {
+      } else if (topicName == topic_names.topicFnd) {
         topic = TopicFnd();
       } else {
         topic = Topic(topicName);
@@ -306,15 +306,15 @@ class TinodeService {
   }
 
   Topic newTopic() {
-    return Topic(topic_names.TOPIC_NEW);
+    return Topic(topic_names.topicNew);
   }
 
   Topic newChannel() {
-    return Topic(topic_names.TOPIC_NEW_CHAN);
+    return Topic(topic_names.topicNewChan);
   }
 
   String newGroupTopicName(bool isChan) {
-    return (isChan ? topic_names.TOPIC_NEW_CHAN : topic_names.TOPIC_NEW) + Tools.getNextUniqueId();
+    return (isChan ? topic_names.topicNewChan : topic_names.topicNew) + Tools.getNextUniqueId();
   }
 
   Topic newTopicWith(String peerUserId) {
@@ -335,7 +335,7 @@ class TinodeService {
 
   /// Request topic metadata
   Future<dynamic> getMeta(String topicName, GetQuery params) {
-    final packet = _packetGenerator.generate(packet_types.Get, topicName);
+    final packet = _packetGenerator.generate(packet_types.get, topicName);
     final data = packet.data as GetPacketData;
 
     data.data = params.data?.toMap();
@@ -349,7 +349,7 @@ class TinodeService {
 
   /// Update topic's metadata: description, subscriptions
   Future<dynamic> setMeta(String topicName, SetParams params) {
-    final packet = _packetGenerator.generate(packet_types.Set, topicName);
+    final packet = _packetGenerator.generate(packet_types.set, topicName);
     final data = packet.data as SetPacketData;
 
     final what = <String>[];
@@ -379,7 +379,7 @@ class TinodeService {
 
   /// Delete some or all messages in a topic
   Future<dynamic> deleteMessages(String topicName, List<DelRange> ranges, bool hard) {
-    final packet = _packetGenerator.generate(packet_types.Del, topicName);
+    final packet = _packetGenerator.generate(packet_types.del, topicName);
     final data = packet.data as DelPacketData;
     data.what = 'msg';
     data.delseq = ranges;
@@ -390,7 +390,7 @@ class TinodeService {
 
   /// Delete the topic all together. Requires Owner permission
   Future<dynamic> deleteTopic(String topicName, bool hard) async {
-    final packet = _packetGenerator.generate(packet_types.Del, topicName);
+    final packet = _packetGenerator.generate(packet_types.del, topicName);
     final data = packet.data as DelPacketData;
     data.what = 'topic';
     data.hard = hard;
@@ -402,7 +402,7 @@ class TinodeService {
 
   /// Delete subscription. Requires Share permission
   Future<dynamic> deleteSubscription(String topicName, String userId) {
-    final packet = _packetGenerator.generate(packet_types.Del, topicName);
+    final packet = _packetGenerator.generate(packet_types.del, topicName);
     final data = packet.data as DelPacketData;
     data.what = 'sub';
     data.user = userId;
@@ -412,7 +412,7 @@ class TinodeService {
 
   /// Delete credential. Always sent on 'me' topic
   Future<dynamic> deleteCredential(String method, String value) {
-    final packet = _packetGenerator.generate(packet_types.Del, topic_names.TOPIC_ME);
+    final packet = _packetGenerator.generate(packet_types.del, topic_names.topicMe);
     final data = packet.data as DelPacketData;
     data.what = 'cred';
     data.cred = {'meth': method, 'val': value};
@@ -422,7 +422,7 @@ class TinodeService {
 
   /// Request to delete account of the current user
   Future<dynamic> deleteCurrentUser(bool hard) {
-    final packet = _packetGenerator.generate(packet_types.Del, null);
+    final packet = _packetGenerator.generate(packet_types.del, null);
     final data = packet.data as DelPacketData;
     data.hard = hard;
     data.what = 'user';
@@ -441,7 +441,7 @@ class TinodeService {
       throw Exception('Invalid message id $seq');
     }
 
-    final packet = _packetGenerator.generate(packet_types.Note, topicName);
+    final packet = _packetGenerator.generate(packet_types.note, topicName);
     final data = packet.data as NotePacketData;
     data.what = what;
     data.seq = seq;
@@ -459,7 +459,7 @@ class TinodeService {
     bool audioRecording = false,
     bool videoRecording = false,
   }) {
-    final packet = _packetGenerator.generate(packet_types.Note, topicName);
+    final packet = _packetGenerator.generate(packet_types.note, topicName);
     final data = packet.data as NotePacketData;
     if (audioRecording) {
       data.what = 'kpa';
@@ -485,7 +485,7 @@ class TinodeService {
     String event, {
     Map<String, dynamic>? payload,
   }) {
-    final packet = _packetGenerator.generate(packet_types.Note, topicName);
+    final packet = _packetGenerator.generate(packet_types.note, topicName);
     final data = packet.data as NotePacketData;
     data.what = 'call';
     data.seq = seq;
@@ -500,7 +500,7 @@ class TinodeService {
   /// [topicName] - The topic to send the notification to
   /// [payload] - Data payload to send
   Future<dynamic> noteData(String topicName, Map<String, dynamic> payload) {
-    final packet = _packetGenerator.generate(packet_types.Note, topicName);
+    final packet = _packetGenerator.generate(packet_types.note, topicName);
     final data = packet.data as NotePacketData;
     data.what = 'data';
     data.payload = payload;
